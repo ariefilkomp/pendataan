@@ -1,0 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.dt-length .dt-input {
+    @apply w-14;
+}
