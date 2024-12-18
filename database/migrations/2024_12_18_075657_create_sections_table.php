@@ -11,14 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('forms', function (Blueprint $table) {
+        Schema::create('sections', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignUuid('user_id')->constrained()->onDelete('cascade');
-            $table->string('table_name')->unique();
-            $table->string('slug')->unique();
+            $table->foreignUuid('form_id')->constrained()->onDelete('cascade');
             $table->string('name');
             $table->text('description');
-            $table->boolean('pubished')->default(false);
+            $table->unsignedInteger('order')->default(0);
             $table->timestamps();
         });
     }
@@ -28,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('forms');
+        Schema::dropIfExists('sections');
     }
 };

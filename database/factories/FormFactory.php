@@ -17,9 +17,12 @@ class FormFactory extends Factory
      */
     public function definition(): array
     {
+        $id = Str::uuid();
         return [
+            'id' => $id,
             'user_id' => User::first()->id,
             'table_name' => strtolower(Str::random(10)),
+            'slug' => $id,
             'name' => "FORMKU ".fake()->name(),
             'description' => fake()->text(100),
         ];
