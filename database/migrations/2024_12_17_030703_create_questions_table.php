@@ -14,12 +14,12 @@ return new class extends Migration
         Schema::create('questions', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignUuid('form_id')->constrained()->onDelete('cascade');
+            $table->foreignUuid('section_id')->constrained()->onDelete('cascade');
             $table->string('column_name');
             $table->text('question');
             $table->enum('type',['short_answer', 'paragraph', 'multiple_choice', 'checkboxes','dropdown','file', 'date', 'time']);
             $table->text('options')->nullable();
-            $table->unsignedTinyInteger('section')->default(1);
-            $table->integer('order')->default(0);
+            $table->integer('order')->default(1);
             $table->timestamps();
         });
     }

@@ -3,6 +3,7 @@
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FormController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SectionController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -19,6 +20,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     
     Route::get('/edit-form/{id}', [FormController::class, 'edit'])->name('edit-form');
     Route::post('/edit-form', [FormController::class, 'update']);
+
+    Route::post('/add-section', [SectionController::class, 'store'])->name('add-section');
 });
 
 Route::middleware('auth')->group(function () {

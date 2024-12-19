@@ -11,13 +11,18 @@ class Form extends Model
     public $incrementing = false;
     protected $keyType = 'string';
 
+    public static function booted() {
+        static::creating(function ($model) {
+            $model->id = $model->id ?? Str::uuid();
+        });
+    }
+    
     public function questions(){
         return $this->hasMany(Question::class);
     }
 
-    public static function booted() {
-        static::creating(function ($model) {
-            $model->id = Str::uuid();
-        });
+    public function sections(){
+        return $this->hasMany(Section::class);
     }
+
 }

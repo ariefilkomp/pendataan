@@ -20,12 +20,12 @@ class FormController extends Controller
         $validated = $request->validate([
             'name' => 'required',
             'description' => 'required',
-            'table_name' => 'nullable',
-            'slug' => 'nullable',
+            'table_name' => 'nullable|unique:forms,table_name',
+            'slug' => 'nullable|unique:forms,slug',
         ]);
 
         if(empty($request->table_name)){
-            $request->table_name = strtolower(Str::random(10));
+            $request->table_name = 'tbl_'.strtolower(Str::random(10));
         } else {
             $request->table_name = Str::snake(trim(strtolower($request->table_name)));
         }

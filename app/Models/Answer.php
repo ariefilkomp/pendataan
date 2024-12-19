@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class Answer extends Model
 {
@@ -11,7 +12,7 @@ class Answer extends Model
 
     public static function booted() {
         static::creating(function ($model) {
-            $model->id = Str::uuid();
+            $model->id = $model->id ?? Str::uuid();
         });
     }
 }

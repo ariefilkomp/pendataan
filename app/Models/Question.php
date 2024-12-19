@@ -12,10 +12,22 @@ class Question extends Model
     public $incrementing = false;
     protected $keyType = 'string';
 
+    public function form(){
+        return $this->belongsTo(Form::class);
+    }
+
+    public function section(){
+        return $this->belongsTo(Section::class);
+    }
+
+    public function answers(){
+        return $this->hasMany(Answer::class);
+    }
+    
     public static function booted() {
         static::creating(function ($model) {
-            $model->id = Str::uuid();
-            $model->column_name = strtolower(Str::random(10));
+            $model->id = $model->id ?? Str::uuid();
+            $model->column_name = $model->column_name ?? 'col_'.strtolower(Str::random(10));
         });
     }
 }

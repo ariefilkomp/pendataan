@@ -68,10 +68,9 @@
                     {
                         "render": function(data, type, row, meta) {
                             let link =
-                                `<a type="button" class="btn btn-icon btn-info waves-effect waves-light" style="margin:5px;" href="{{ url('/pengajuan') }}/` +
+                                `<a type="button" class="rounded border border-gray-300 bg-white px-2 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50" style="margin:5px;" href="{{ url('/edit-form') }}/` +
                                 row.id +
-                                `" title="Lihat">
-                                <i class="fa fa-search"></i></a>&nbsp;
+                                `" title="Lihat">edit</a>&nbsp;
                                 `;
 
                             return link;

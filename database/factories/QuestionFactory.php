@@ -20,6 +20,7 @@ class QuestionFactory extends Factory
     {
         return [
             'form_id' => fake()->uuid(),
+            'section_id' => fake()->uuid(),
             'question' => fake()->text(100),
             'type' => fake()->randomElement(['short_answer', 'paragraph', 'multiple_choice', 'checkboxes','dropdown','file', 'date', 'time']),
         ];

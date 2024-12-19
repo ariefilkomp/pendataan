@@ -25,7 +25,7 @@ class DashboardController extends Controller
         $orderBy = empty(request()->input("order.0.column")) ? 'id' : (isset($columns[request()->input("order.0.column")]) ? $columns[request()->input("order.0.column")] : 'id');
         $ord = empty(request()->input("order.0.dir")) ? 'desc' : request()->input("order.0.dir");
         
-        $data = Form::query();
+        $data = Form::with('sections');
 
         if(request()->input('search.value')) {
             $data = $data->where( function($query) {

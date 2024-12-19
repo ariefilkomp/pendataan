@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignUuid('form_id')->constrained()->onDelete('cascade');
             $table->string('name');
             $table->text('description');
-            $table->unsignedInteger('order')->default(0);
+            $table->unsignedInteger('order')->default(1);
             $table->timestamps();
         });
     }
