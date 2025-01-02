@@ -19,6 +19,7 @@ return new class extends Migration
             $table->text('question');
             $table->enum('type',['short_answer', 'paragraph', 'multiple_choice', 'checkboxes','dropdown','file', 'date', 'time']);
             $table->text('options')->nullable();
+            $table->boolean('is_required')->default(false);
             $table->integer('order')->default(1);
             $table->timestamps();
         });

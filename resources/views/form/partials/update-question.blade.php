@@ -1,26 +1,230 @@
 <section>
-    <header class="flex gap-4">
-        <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
-            {{ __('Section '.$form->sections[0]->order. ' / '. $form->sections->count()) }}
-        </h2>
-        @if($form->sections[0]->order < $form->sections->count())
-            <x-secondary-button>{{ __('Next') }}</x-secondary-button>
-        @endif
-        <x-secondary-button 
-            x-data="" 
-            x-on:click.prevent="$dispatch('open-modal', 'add-section-modal')">
-            <svg class="w-2 h-2" fill="#000000" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 45.402 45.402" xml:space="preserve"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <path d="M41.267,18.557H26.832V4.134C26.832,1.851,24.99,0,22.707,0c-2.283,0-4.124,1.851-4.124,4.135v14.432H4.141 c-2.283,0-4.139,1.851-4.138,4.135c-0.001,1.141,0.46,2.187,1.207,2.934c0.748,0.749,1.78,1.222,2.92,1.222h14.453V41.27 c0,1.142,0.453,2.176,1.201,2.922c0.748,0.748,1.777,1.211,2.919,1.211c2.282,0,4.129-1.851,4.129-4.133V26.857h14.435 c2.283,0,4.134-1.867,4.133-4.15C45.399,20.425,43.548,18.557,41.267,18.557z"></path> </g> </g></svg>
-        &nbsp; Add Section</x-secondary-button>
-        @if (session('status') === 'section-created')
+    <div class="mt-6 px-2">
+        <p class="text-gray-700 text-base">{{ $form->sections->where('id', $section_id)->first()->description }}</p>
+        <form method="post" action="{{ route('add-question') }}" class="p-6" x-data="dynamicForm()">
+            @if (session('status') === 'question-updated')
                 <p
                     x-data="{ show: true }"
                     x-show="show"
                     x-transition
-                    x-init="setTimeout(() => show = false, 2000)"
+                    x-init="setTimeout(() => show = false, 3000)"
                     class="text-sm text-gray-600 dark:text-gray-400"
-                >{{ __('Section created successfully.') }}</p>
+                >{{ __('Question Updated.') }}</p>
             @endif
-    </header>
+
+            @if (session('status') === 'question-created')
+                <p
+                    x-data="{ show: true }"
+                    x-show="show"
+                    x-transition
+                    x-init="setTimeout(() => show = false, 3000)"
+                    class="text-sm text-gray-600 dark:text-gray-400"
+                >{{ __('Question Created.') }}</p>
+            @endif
+
+            @foreach ($form->questions->sortBy('created_at') as $question)
+                @if ($question->section_id == $section_id)
+                    <x-question-card :question="$question" />
+                @endif
+            @endforeach
+            @if ($errors->addQuestion->isNotEmpty())
+                @foreach ($errors->addQuestion->all() as $message)
+                    <p class="text-red-500 text-sm">{{ $message }}</p>
+                @endforeach
+            @endif
+
+
+            @csrf
+            <input type="hidden" name="form_id" value="{{ $form->id }}">
+            <input type="hidden" name="section_id" value="{{ $section_id }}">
+            <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100 mt-4">
+                {{ __('Add Question') }}
+            </h2>
+
+            <div class="mt-4">
+                <x-input-label for="question" :value="__('Question *')" />
+                <x-textarea-input id="question" name="question" type="text" class="mt-1 block w-full" required
+                    autofocus autocomplete="question">{{ old('question') }}</x-textarea-input>
+                <x-input-error class="mt-2" :messages="$errors->get('question')" />
+            </div>
+
+            <div class="flex gap-8">
+                <div class="mt-4">
+                    <x-input-label for="column_name" :value="__('Column Name')" />
+                    <x-text-input id="column_name" name="column_name" type="text" class="mt-1 block w-full"
+                        :value="old('column_name')" autofocus autocomplete="column_name" />
+                    <x-input-error class="mt-2" :messages="$errors->get('column_name')" />
+                </div>
+
+                <div class="mt-4">
+                    <x-input-label for="type" :value="__('Type')" />
+                    <x-select-input name="type" class="mt-1 block w-full"
+                        x-on:change="typeChange($event.target.value)">
+                        @foreach ($optType as $key => $value)
+                            <option value="{{ $key }}" {{ old('type') == $key ? 'selected' : '' }}>
+                                {{ $value }}</option>
+                        @endforeach
+                    </x-select-input>
+                    <x-input-error class="mt-2" :messages="$errors->get('type')" />
+                </div>
+                <div class="mt-4">
+                    <label class="cursor-pointer">
+                        <span class="block font-medium text-sm text-gray-700 dark:text-gray-300">Required</span>
+                    <input type="checkbox" value="1" name="is_required"
+                            class="sr-only peer">
+                        <div
+                            class="mt-2 relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600">
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <div class="mt-4" id="options" x-show="addInputShow">
+                <div class="flex flex-col text-center items-center">
+
+                    <div id="inputContainer" class="w-full">
+                        <div class="flex gap-4 w-full input-group">
+                            <x-text-input name="options[]" placeholder="Isi Opsi"
+                                type="text" class="mt-1 block w-full" autocomplete="option[]" />
+                            <p class="pt-2">
+                                <x-danger-button type="button"
+                                    class="text-xs rounded m-0 remove-btn">&times;</x-danger-button>
+                            </p>
+                        </div>
+                    </div>
+                    <button type="button" id="addInput"
+                        class="text-xs rounded mt-2 p-2 border border-collapse w-24 ">Add Input</button>
+                    <x-input-error class="mt-2" :messages="$errors->get('options')" />
+                </div>
+            </div>
+
+
+            <div class="mt-6 flex justify-end">
+                <x-primary-button class="ms-3">
+                    {{ __('Add Question') }}
+                </x-primary-button>
+            </div>
+
+            <script>
+                $(document).ready(function() {
+                    // Handle add input button
+                    $('#addInput').on('click', function() {
+                        const newInput = `
+                            <div class="flex gap-4 w-full input-group">
+                                <x-text-input name="options[]"
+                                    type="text" class="mt-1 block w-full" placeholder="Isi Opsi" />
+                                <p class="pt-2">
+                                    <x-danger-button type="button"
+                                        class="text-xs rounded m-0 remove-btn">&times;</x-danger-button>
+                                </p>
+                            </div>
+                        `;
+                        $('#inputContainer').append(newInput);
+                    });
+
+                    $('#addInput_update').on('click', function() {
+                        const newInput = `
+                            <div class="flex gap-4 w-full input-group">
+                                <x-text-input name="options[]"
+                                    type="text" class="mt-1 block w-full" placeholder="Isi Opsi" />
+                                <p class="pt-2">
+                                    <x-danger-button type="button"
+                                        class="text-xs rounded m-0 remove-btn">&times;</x-danger-button>
+                                </p>
+                            </div>
+                        `;
+                        $('#inputContainer_update').append(newInput);
+                    });
+
+                    // Handle remove input button
+                    $(document).on('click', '.remove-btn', function() {
+                        $(this).closest('.input-group').remove();
+                    });
+
+                    // Handle form submission
+                    $('#dynamicForm').on('submit', function(e) {
+                        e.preventDefault(); // Prevent default form submission
+
+                        const formData = $(this).serializeArray();
+                        console.log('Form Data:', formData);
+
+                        alert('Form submitted! Check console for data.');
+                    });
+                });
+
+                function dynamicForm() {
+                    return {
+                        inputs: [
+                            @if (old('options'))
+                                @foreach (old('options') as $option)
+                                    {
+                                        id: {{ $loop->iteration }},
+                                        value: '{{ $option }}',
+                                        placeholder: 'Option {{ $loop->iteration }}'
+                                    },
+                                @endforeach
+                            @else
+                                inputOpt
+                            @endif
+                        ],
+                        addInputShow: false,
+                        addInput() {
+                            this.inputs.push({
+                                id: this.inputs.length + 1,
+                                value: '',
+                                placeholder: `Input ${this.inputs.length + 1}`
+                            })
+                        },
+                        removeField(index) {
+                            this.inputs.splice(index, 1);
+                        },
+                        typeChange(type) {
+                            if (type == 'multiple_choice' || type == 'checkboxes' || type == 'dropdown') {
+                                this.addInputShow = true;
+                            } else {
+                                this.addInputShow = false;
+                            }
+                        }
+                    }
+                }
+
+                function setUpdateData(data) {
+
+                    $('#question_id_update').val(data.id);
+                    $('#question_update').val(data.question);
+                    $('#column_name_update').val(data.column_name);
+                    $('#type_update').val(data.type);
+                    $('#is_required_update').prop('checked', data.is_required);
+
+                    if (data.type == 'multiple_choice' || data.type == 'checkboxes' || data.type == 'dropdown') {
+                        $('#options_update').show();
+                    }
+
+                    if (data.options) {
+                        $('#inputContainer_update').empty();
+                        console.log('data.options', data.options);
+                        let opt = JSON.parse(data.options);
+                        console.log('opt', opt);
+                        opt.forEach((option, index) => {
+                            const newInput = `
+                                <div class="flex gap-4 w-full input-group">
+                                    <x-text-input name="options[]"
+                                        type="text" class="mt-1 block w-full" placeholder="Isi Opsi" value="${option}" />
+                                    <p class="pt-2">
+                                        <x-danger-button type="button"
+                                            class="text-xs rounded m-0 remove-btn">&times;</x-danger-button>
+                                    </p>
+                                </div>
+                            `;
+                            $('#inputContainer_update').append(newInput);
+                        });
+                    }
+
+                }
+            </script>
+
+        </form>
+    </div>
 </section>
 
 <x-modal name="add-section-modal" :show="$errors->addSection->isNotEmpty()" focusable>
@@ -33,16 +237,15 @@
 
         <div>
             <x-input-label for="name" :value="__('Section Name')" />
-            <x-text-input id="name" name="name" type="text" class="mt-1 block w-full"
-                :value="old('name')" required autofocus autocomplete="name" />
+            <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name')"
+                required autofocus autocomplete="name" />
             <x-input-error class="mt-2" :messages="$errors->get('name')" />
         </div>
 
         <div>
             <x-input-label for="description" :value="__('Description')" />
-            <x-textarea-input id="description" name="description" type="text"
-                class="mt-1 block w-full" required autofocus
-                autocomplete="description">{{ old('description') }}</x-textarea-input>
+            <x-textarea-input id="description" name="description" type="text" class="mt-1 block w-full" required
+                autofocus autocomplete="description">{{ old('description') }}</x-textarea-input>
             <x-input-error class="mt-2" :messages="$errors->get('description')" />
         </div>
 
@@ -57,3 +260,160 @@
         </div>
     </form>
 </x-modal>
+
+<x-modal name="delete-section-modal" :show="$errors->sectionDeletion->isNotEmpty()" focusable>
+    <form method="post" action="{{ route('delete-section') }}" class="p-6">
+        @csrf
+        @method('delete')
+
+        <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
+            {{ __('Anda yakin untuk menghapus section : ' . $form->sections->where('id', $section_id)->first()->name . '?') }}
+        </h2>
+
+        <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+            {{ __('Once your account is deleted, all of its resources and data will be permanently deleted.') }}
+        </p>
+
+        <input type="hidden" name="section_id" value="{{ $section_id }}">
+        <div class="mt-6 flex justify-end">
+            <x-secondary-button x-on:click="$dispatch('close')">
+                {{ __('Cancel') }}
+            </x-secondary-button>
+
+            <x-danger-button class="ms-3">
+                {{ __('Delete Section') }}
+            </x-danger-button>
+        </div>
+    </form>
+</x-modal>
+
+<x-modal name="edit-question-modal" :show="$errors->updateQuestion->isNotEmpty()" focusable>
+    <form method="post" action="{{ route('update-question') }}" class="p-6" x-data="dynamicFormUpdate()">
+        @if ($errors->addQuestion->isNotEmpty())
+            @foreach ($errors->addQuestion->all() as $message)
+                <p class="text-red-500 text-sm">{{ $message }}</p>
+            @endforeach
+        @endif
+
+
+        @csrf
+        <input type="hidden" name="form_id" value="{{ $form->id }}">
+        <input type="hidden" name="section_id" value="{{ $section_id }}">
+        <input type="hidden" name="question_id" value="" id="question_id_update">
+        <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
+            {{ __('Update Question') }}
+        </h2>
+
+        <div class="mt-4">
+            <x-input-label for="question_update" :value="__('Question *')" />
+            <x-textarea-input id="question_update" name="question" type="text" class="mt-1 block w-full" required
+                autofocus autocomplete="question">{{ old('question') }}</x-textarea-input>
+            <x-input-error class="mt-2" :messages="$errors->get('question')" />
+        </div>
+
+        <div class="flex gap-8">
+            <div class="mt-4">
+                <x-input-label for="column_name_update" :value="__('Column Name')" />
+                <x-text-input id="column_name_update" name="column_name" type="text" class="mt-1 block w-full"
+                    :value="old('column_name')" autofocus autocomplete="column_name" />
+                <x-input-error class="mt-2" :messages="$errors->get('column_name')" />
+            </div>
+
+            <div class="mt-4">
+                <x-input-label for="type" :value="__('Type')" />
+                <x-select-input name="type" id="type_update" class="mt-1 block w-full"
+                    x-on:change="typeChange($event.target.value)">
+                    @foreach ($optType as $key => $value)
+                        <option value="{{ $key }}" {{ old('type') == $key ? 'selected' : '' }}>
+                            {{ $value }}</option>
+                    @endforeach
+                </x-select-input>
+                <x-input-error class="mt-2" :messages="$errors->get('type')" />
+            </div>
+            <div class="mt-4">
+                <label class="cursor-pointer">
+                    <span class="block font-medium text-sm text-gray-700 dark:text-gray-300">Required</span>
+                    <input type="checkbox" id="is_required_update" value="1"
+                        name="is_required" class="sr-only peer">
+                    <div
+                        class="mt-2 relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600">
+                    </div>
+                </label>
+            </div>
+        </div>
+
+        <div class="mt-4" id="options_update" x-show="addInputShow">
+            <div class="flex flex-col text-center items-center">
+                <div id="inputContainer_update" class="w-full">
+                    
+                </div>
+                <button type="button" id="addInput_update"
+                    class="text-xs rounded mt-2 p-2 border border-collapse w-24 ">Add Input</button>
+                <x-input-error class="mt-2" :messages="$errors->get('options')" />
+            </div>
+        </div>
+
+
+        <div class="mt-6 flex justify-end">
+            <x-secondary-button x-on:click="$dispatch('close')">
+                {{ __('Cancel') }}
+            </x-secondary-button>
+
+            <x-primary-button class="ms-3">
+                {{ __('Update Question') }}
+            </x-primary-button>
+        </div>
+
+        <script>
+            function dynamicFormUpdate() {
+                return {
+                    inputs: [
+                        @if (old('options'))
+                            @foreach (old('options') as $option)
+                                {
+                                    id: {{ $loop->iteration }},
+                                    value: '{{ $option }}',
+                                    placeholder: 'Option {{ $loop->iteration }}'
+                                },
+                            @endforeach
+                        @else
+                            inputOpt
+                        @endif
+                    ],
+                    addInputShow: false,
+                    addInput() {
+                        this.inputs.push({
+                            id: this.inputs.length + 1,
+                            value: '',
+                            placeholder: `Input ${this.inputs.length + 1}`
+                        })
+                    },
+                    removeField(index) {
+                        this.inputs.splice(index, 1);
+                    },
+                    typeChange(type) {
+                        if (type == 'multiple_choice' || type == 'checkboxes' || type == 'dropdown') {
+                            this.addInputShow = true;
+                        } else {
+                            this.addInputShow = false;
+                        }
+                    },
+                    setUpdateData(id) {
+                        console.log('id', id);
+                    }
+                }
+            }
+        </script>
+
+    </form>
+</x-modal>
+
+<script>
+    var inputOpt = {
+        id: 1,
+        value: 'Option 1',
+        placeholder: 'Input 1'
+    }
+
+    var addInputShowUpdate = false;
+</script>

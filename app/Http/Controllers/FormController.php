@@ -6,10 +6,22 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Models\Form;
 use App\Models\Section;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 
 class FormController extends Controller
 {
+    private $optType = [
+        'short_answer' => 'Short Answer',
+        'paragraph' => 'Paragraph', 
+        'multiple_choice' => 'Multiple Choice',
+        'checkboxes' => 'Checkboxes',
+        'dropdown' => 'Dropdown',
+        'file' => 'File', 
+        'date' => 'Date', 
+        'time' => 'Time'
+    ];
+
     public function create(){
         return view('form.create', [
             'user' => auth()->user(),]);
@@ -23,6 +35,11 @@ class FormController extends Controller
             'table_name' => 'nullable|unique:forms,table_name',
             'slug' => 'nullable|unique:forms,slug',
         ]);
+
+        $routeCollection = collect(Route::getRoutes()->get())->unique();
+        if($routeCollection->where('uri', $request->slug)->count() > 0) {
+            return redirect()->route('create-form')->with('error', 'Slug already exists');
+        }
 
         if(empty($request->table_name)){
             $request->table_name = 'tbl_'.strtolower(Str::random(10));
@@ -49,9 +66,8 @@ class FormController extends Controller
                 'form_id' => $uuid,
                 'name' => $form->name,
                 'description' => $form->description,
-                'order' => 0
             ]);
-            $str = 'CREATE TABLE `' . $form->table_name . '` (id char(36) NOT NULL, PRIMARY KEY (id)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci';
+            $str = 'CREATE TABLE `' . $form->table_name . '` (id char(36) NOT NULL, user_id char(36) NOT NULL, submitted_at datetime DEFAULT NULL, PRIMARY KEY (id)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci';
             DB::statement($str);
         }
         
@@ -59,8 +75,20 @@ class FormController extends Controller
     }
 
     public function edit($id){
+        $form = Form::findOrFail($id);
         return view('form.update-mainform', [
-            'form' => Form::findOrFail($id),
+            'form' => $form,
+            'section_id' => $form->sections->sortBy('order', SORT_NUMERIC)->first()->id,
+            'optType' => $this->optType
+        ]);
+    }
+
+    public function editWithSection($id, $section_id){
+        $form = Form::findOrFail($id);
+        return view('form.update-mainform', [
+            'form' => $form,
+            'section_id' => $section_id,
+            'optType' => $this->optType
         ]);
     }
 
@@ -70,5 +98,69 @@ class FormController extends Controller
         $form->name = $request->name;
         $form->save();
         return redirect()->route('edit-form');
+    }
+
+    public function show($slug){
+        $form = Form::where('slug', $slug)->where('published', 1)->first();
+        if(empty($form)){
+            abort(404);
+        }
+        $data = DB::table($form->table_name)->where('user_id', auth()->user()->id)->whereNull('submitted_at')->first();
+        return view('form.show', [
+            'form' => $form,
+            'section' => $form->sections->sortBy('order', SORT_NUMERIC)->first(),
+            'optType' => $this->optType,
+            'data' => $data
+        ]);
+    }
+
+    public function showWithSection($slug, $section_id){
+        $form = Form::where('slug', $slug)->where('published', 1)->first();
+        $section = $form->sections->where('id', $section_id)->first();
+        if(empty($form) || empty($section)){
+            abort(404);
+        }
+        $data = DB::table($form->table_name)->where('user_id', auth()->user()->id)->whereNull('submitted_at')->first();
+        return view('form.show', [
+            'form' => $form,
+            'section' => $section,
+            'optType' => $this->optType,
+            'data' => $data
+        ]);
+    }
+    
+    public function submit(Request $request){
+        $form = Form::findOrFail($request->id);
+        $section = $form->sections->where('id', $request->section_id)->first();
+        if(empty($section)){
+            abort(404);
+        }
+
+        $questions = $section->questions->where('section_id', $section->id)->where('form_id', $form->id);
+        $validation = [];
+        foreach($questions as $question) {
+            $validation[$question->column_name] = $question->is_required ? 'required' : 'nullable';
+        }
+
+        $validated = $request->validateWithBag('submitForm', $validation);
+        $data = DB::table($form->table_name)->where('user_id', auth()->user()->id)->whereNull('submitted_at')->first();
+
+        if(empty($data)) {
+            DB::table($form->table_name)->insert(
+                array_merge([
+                'id' => Str::uuid(),
+                'user_id' => auth()->user()->id
+            ], $validated));
+        } else {
+            DB::table($form->table_name)->where('user_id', auth()->user()->id)->whereNull('submitted_at')->update($validated);
+        }
+
+        if($form->sections->count() == 1 || $section->order == $form->sections->count()) {
+            DB::table($form->table_name)->where('user_id', auth()->user()->id)->whereNull('submitted_at')->update(['submitted_at' => now()]);
+            return view('form.submitted');
+        } else {
+            $nextSection = $form->sections->where('order', $section->order + 1)->first();
+            return redirect('/'.$form->slug.'/'.$nextSection->id)->with('status', 'form-submitted');
+        }
     }
 }

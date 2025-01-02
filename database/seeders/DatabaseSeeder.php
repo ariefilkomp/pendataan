@@ -23,24 +23,23 @@ class DatabaseSeeder extends Seeder
             'name' => 'Test User',
             'email' => 'test@example.com',
         ]);
-        echo "user ok\n";
-        $form = Form::factory()->create([
-            'user_id' => $user->id
-        ]);
-        echo "form ok\n";
 
-        $section = Section::factory()->create([
-            'id' => Str::uuid(),
-            'form_id' => $form->id,
-            'name' => $form->name,
-            'description' => $form->description
-        ]);
-        echo "section ok\n";
+        // $form = Form::factory()->create([
+        //     'user_id' => $user->id
+        // ]);
 
-        Question::factory(10)->create([
-            'form_id' => $form->id,
-            'section_id' => $section->id
-        ]);
-        echo "question ok\n";
+
+        // $section = Section::factory()->create([
+        //     'id' => Str::uuid(),
+        //     'form_id' => $form->id,
+        //     'name' => $form->name,
+        //     'description' => $form->description
+        // ]);
+
+        // Question::factory(10)->create([
+        //     'form_id' => $form->id,
+        //     'section_id' => $section->id
+        // ]);
+
     }
 }
