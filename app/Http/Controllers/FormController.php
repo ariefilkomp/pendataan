@@ -93,11 +93,17 @@ class FormController extends Controller
     }
 
     public function update(Request $request){
-        $form = new Form();
-        $form->user_id = auth()->user()->id;
-        $form->name = $request->name;
+        $form = Form::findOrFail($request->id);
+        $oldTableName = $form->table_name;
+        $form->fill($request->all());
+
+        if($form->isDirty('table_name')) {
+            $form->table_name = Str::snake(trim(strtolower($request->table_name)));
+            DB::statement('RENAME TABLE `' . $oldTableName . '` TO `' . $form->table_name .'`');
+        }
+
         $form->save();
-        return redirect()->route('edit-form');
+        return redirect()->back()->with('status', 'form-updated');
     }
 
     public function show($slug){

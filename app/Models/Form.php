@@ -10,6 +10,7 @@ class Form extends Model
     use HasFactory;
     public $incrementing = false;
     protected $keyType = 'string';
+    protected $guarded = [];
 
     public static function booted() {
         static::creating(function ($model) {

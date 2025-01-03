@@ -20,7 +20,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/create-form', [FormController::class, 'store']);
     
     Route::get('/edit-form/{id}', [FormController::class, 'edit'])->name('edit-form');
-    Route::post('/edit-form', [FormController::class, 'update']);
+    Route::patch('/edit-form', [FormController::class, 'update']);
     Route::get('/edit-form/{id}/{section_id}', [FormController::class, 'editWithSection'])->name('edit-form-section');
 
     Route::post('/add-section', [SectionController::class, 'store'])->name('add-section');

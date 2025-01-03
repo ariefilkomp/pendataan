@@ -13,8 +13,10 @@
             </svg>
         </button>
         <div x-cloak x-show="isExpanded" id="accordionItemOne" role="region" aria-labelledby="controlsAccordionItemOne" x-collapse>
-            <form method="post" action="{{ route('create-form') }}" class="mt-6 space-y-6">
+            <form method="post" action="{{ url('edit-form') }}" class="mt-6 space-y-6">
                 @csrf
+                @method('patch')
+                <input type="hidden" name="id" value="{{ $form->id }}">
                 <div>
                     <x-input-label for="name" :value="__('Nama Form *')" />
                     <x-text-input id="name" name="name" type="text" class="mt-1 block w-full"

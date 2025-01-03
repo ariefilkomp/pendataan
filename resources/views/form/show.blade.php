@@ -4,7 +4,7 @@
         <div class="relative pt-24 lg:pt-28">
             <div class="mx-auto px-6 max-w-7xl md:px-12">
                 <h1 class="text-wrap mx-auto mt-8 max-w-xl text-3xl md:text-4xl font-semibold text-body">
-                    {{ $form->name }}
+                    {{ $form?->name }}
                 </h1>
                 <h3 class="text-wrap mx-auto mt-8 max-w-xl text-lg text-body">{{ $section->description }}</h3>
                 <form method="post" action="{{ route('form-submit') }}" class="mt-6 space-y-6">
@@ -22,6 +22,7 @@
                         </div>
                     @else
                         @foreach($form->questions->where('section_id', $section->id)->sortBy('created_at') as $question)
+                            @if(empty($question)) @continue @endif
                             <x-question :question="$question" :answers="$data"></x-question>
                         @endforeach
                         @php 
