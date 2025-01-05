@@ -109,9 +109,16 @@ class FormController extends Controller
     public function show($slug){
         $form = Form::where('slug', $slug)->where('published', 1)->first();
         if(empty($form)){
-            abort(404);
+            abort(404);  
         }
         $data = DB::table($form->table_name)->where('user_id', auth()->user()->id)->whereNull('submitted_at')->first();
+        if(empty($data)){
+            DB::table($form->table_name)->insert([
+                'id' => Str::uuid(),
+                'user_id' => auth()->user()->id
+            ]);
+            $data = DB::table($form->table_name)->where('user_id', auth()->user()->id)->whereNull('submitted_at')->first();
+        }
         return view('form.show', [
             'form' => $form,
             'section' => $form->sections->sortBy('order', SORT_NUMERIC)->first(),
@@ -144,11 +151,21 @@ class FormController extends Controller
 
         $questions = $section->questions->where('section_id', $section->id)->where('form_id', $form->id);
         $validation = [];
+        $checkbox = [];
         foreach($questions as $question) {
             $validation[$question->column_name] = $question->is_required ? 'required' : 'nullable';
+            if($question->type == 'checkboxes' ) {
+                $checkbox[] = $question->column_name;
+            }
         }
 
         $validated = $request->validateWithBag('submitForm', $validation);
+
+        if(count($checkbox) > 0) {
+            foreach($checkbox as $c) {
+                $validated[$c] = json_encode($request->{$c});
+            }
+        }
         $data = DB::table($form->table_name)->where('user_id', auth()->user()->id)->whereNull('submitted_at')->first();
 
         if(empty($data)) {

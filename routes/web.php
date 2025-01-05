@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\FileController;
 use App\Http\Controllers\FormController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\QuestionController;
@@ -41,3 +42,4 @@ require __DIR__.'/auth.php';
 Route::get('/{slug}', [FormController::class, 'show'])->name('show-form');
 Route::get('/{slug}/{section_id}', [FormController::class, 'showWithSection'])->name('show-form-with-section');
 Route::post('/form-submit', [FormController::class, 'submit'])->name('form-submit');
+Route::post('/upload-file', [FileController::class, 'upload'])->name('upload-file');

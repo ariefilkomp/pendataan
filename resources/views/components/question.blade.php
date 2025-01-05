@@ -55,7 +55,7 @@
         @endif
 
         @if($question?->type == 'file')
-            <input name="{{ $question?->column_name }}" type="file" accept="image/*, .pdf, .doc, .docx" class="mt-1 block w-full bg-white" autofocus autocomplete="{{ $question?->column_name }}" value="{{ old($question?->column_name, $answers?->{$question?->column_name}) }}" />
+            <input name="{{ $question?->column_name }}" id="{{ $answers?->id }}-{{ $question?->column_name }}" onchange="saveFile('{{ $answers?->id }}-{{ $question?->column_name }}', '{{ $question?->id }}', '{{ $answers?->id }}')" type="file" accept="image/*, .pdf, .doc, .docx" class="mt-1 block w-full bg-white" autofocus autocomplete="{{ $question?->column_name }}" value="{{ old($question?->column_name, $answers?->{$question?->column_name}) }}" />
             <x-input-error class="mt-2" :messages="$errors->get( $question?->column_name )" />
         @endif
 

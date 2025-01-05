@@ -13,6 +13,8 @@
         <!-- Styles / Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
 
+        <script src="{{ url("/assets/js/jquery-3.7.1.min.js") }}" rel="script" ></script>
+
     </head>
     <body class="font-sans antialiased dark:bg-black dark:text-white/50">
         <x-nav-header></x-nav-header>

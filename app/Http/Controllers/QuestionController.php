@@ -27,11 +27,11 @@ class QuestionController extends Controller
         }
 
         $colStr = "";
-        if($request->type == 'checkboxes' || $request->type == 'dropdown' || $request->type == 'multiple_choice' || $request->type == 'paragraph') {
+        if($request->type == 'checkboxes' || $request->type == 'dropdown' || $request->type == 'multiple_choice' || $request->type == 'paragraph' || $request->type == 'file') {
             $colStr = "`{$request->column_name}` TEXT NULL DEFAULT NULL";
         }
 
-        if($request->type == 'short_answer' || $request->type == 'file') {
+        if($request->type == 'short_answer') {
             $colStr = "`{$request->column_name}` VARCHAR(255) NULL DEFAULT NULL";
         }
 
@@ -82,11 +82,11 @@ class QuestionController extends Controller
         }
 
         $colStr = "";
-        if($request->type == 'checkboxes' || $request->type == 'dropdown' || $request->type == 'multiple_choice' || $request->type == 'paragraph') {
+        if($request->type == 'checkboxes' || $request->type == 'dropdown' || $request->type == 'multiple_choice' || $request->type == 'paragraph' || $request->type == 'file') {
             $colStr = "`{$request->column_name}` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL";
         }
 
-        if($request->type == 'short_answer' || $request->type == 'file') {
+        if($request->type == 'short_answer') {
             $colStr = "`{$request->column_name}` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL";
         }
 

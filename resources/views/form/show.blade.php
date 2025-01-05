@@ -44,4 +44,92 @@
             </div>
         </div>
     </section>
+    <script>
+        function saveFile(fieldId, questionId, answerId) {
+            var formData = new FormData();
+            let file = $("#" + fieldId)[0].files[0];
+            if (file == undefined) return;
+            urlx = '{{ route('upload-file') }}';
+
+            if (file.size > 1000000) {
+                Swal.fire({
+                    title: ':(',
+                    text: 'Ukuran file Tidak boleh lebih dari 1 MB.',
+                    icon: 'error',
+                    confirmButtonText: 'close'
+                });
+                return;
+            }
+
+            formData.append('file', file);
+            formData.append('form_id', '{{ $form->id }}');
+            formData.append('question_id', questionId);
+            formData.append('answer_id', answerId);
+            formData.append('_token', '{{ csrf_token() }}');
+            
+            $.ajax({
+                type: "POST",
+                url: urlx,
+                data: formData,
+                processData: false, // tell jQuery not to process the data
+                contentType: false, // tell jQuery not to set contentType
+                beforeSend: function() {
+                    Swal.fire({
+                        text: 'Menyimpan ...',
+                    });
+                    Swal.showLoading();
+                },
+                success: function(result) {
+
+                    try {
+                        var result = JSON.parse(result);
+                    } catch (err) {
+                        Swal.fire({
+                            title: ':(',
+                            text: 'Server Error ...',
+                            icon: 'error',
+                            confirmButtonText: 'close'
+                        });
+                    }
+
+                    if (result.success === true) {
+                        Swal.fire({
+                            text: result.pesan,
+                            icon: 'success',
+                            confirmButtonText: 'close',
+                            onClose: redirectToTab(tabIndex)
+                        });
+                    } else if (result.success === false) {
+                        Swal.fire({
+                            text: result.pesan,
+                            icon: 'error',
+                            confirmButtonText: 'close'
+                        });
+                    } else {
+                        console.log('parse error!');
+                    }
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    let allMessage = '<ul>';
+                    let title =  jqXHR.responseJSON?.message;
+                    if(jqXHR.responseJSON?.errors) {
+                        $.each(jqXHR.responseJSON?.errors, function(key, value) {
+                            allMessage += '<li class="alert alert-danger">' + value + '</li>';
+                        });
+                    } else {
+                        allMessage += '<li class="alert alert-danger">SERVER ERROR!</li>'
+                    }
+                    allMessage += '</ul>';
+
+                    Swal.fire({
+                        title: title,
+                        html: allMessage,
+                        icon: 'error',
+                        confirmButtonText: 'close',
+                        onClose: backToTab(tabIndex)
+                    });
+                }
+            });
+        }
+    </script>
 </x-common-layout>

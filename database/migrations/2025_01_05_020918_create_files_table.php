@@ -11,17 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('forms', function (Blueprint $table) {
+        Schema::create('files', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignUuid('user_id')->constrained()->onDelete('cascade');
-            $table->string('table_name')->unique();
-            $table->string('slug')->unique();
+            $table->foreignUuid('form_id')->constrained()->onDelete('cascade');
+            $table->foreignUuid('question_id')->constrained()->onDelete('cascade');
+            $table->uuid('answer_id');
+            $table->string('path');
             $table->string('name');
-            $table->text('description');
-            $table->boolean('published')->default(false);
-            $table->enum('for_role', ['umum', 'opd'])->default('umum');
-            $table->integer('id_opds')->nullable();
-            $table->string('short_url')->nullable();
+            $table->string('extension');
+            $table->string('mime_type');
+            $table->string('size');
             $table->timestamps();
         });
     }
@@ -31,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('forms');
+        Schema::dropIfExists('files');
     }
 };
