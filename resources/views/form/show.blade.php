@@ -68,6 +68,16 @@
             formData.append('_token', '{{ csrf_token() }}');
             
             $.ajax({
+                xhr: function() {
+                    var xhr = new window.XMLHttpRequest();
+                    xhr.upload.addEventListener("progress", function(evt) {
+                        if (evt.lengthComputable) {
+                            var percentComplete = ((evt.loaded / evt.total) * 100);
+                            console.log(percentComplete);
+                        }
+                    }, false);
+                    return xhr;
+                },
                 type: "POST",
                 url: urlx,
                 data: formData,
@@ -96,10 +106,6 @@
                     } else {
                         console.log('parse error!');
                     }
-                },
-                uploadProgress: function(event, position, total, percentComplete) {
-                    var percentVal = percentComplete + '%';
-                    console.log(percentVal);
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
                     let allMessage = '<ul>';
