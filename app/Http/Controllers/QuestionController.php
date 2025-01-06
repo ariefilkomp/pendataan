@@ -24,6 +24,8 @@ class QuestionController extends Controller
 
         if(empty($request->column_name)) {
             $request->column_name = 'col_'.strtolower(Str::random(10));
+        } else {
+            $request->column_name = Str::snake(trim(strtolower($request->column_name)));
         }
 
         $colStr = "";

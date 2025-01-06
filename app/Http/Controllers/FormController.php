@@ -152,10 +152,20 @@ class FormController extends Controller
         $questions = $section->questions->where('section_id', $section->id)->where('form_id', $form->id);
         $validation = [];
         $checkbox = [];
+        $unsetFiles = [];
         foreach($questions as $question) {
-            $validation[$question->column_name] = $question->is_required ? 'required' : 'nullable';
+            $filter = $question->is_required ? 'required' : 'nullable';
+            $validation[$question->column_name] = $filter;
             if($question->type == 'checkboxes' ) {
                 $checkbox[] = $question->column_name;
+            }
+
+            if($question->type == 'file') {
+                $unsetFiles[] = $question->column_name;
+            }
+
+            if($question->type == 'date') {
+                $filter .= '|date';
             }
         }
 
@@ -166,6 +176,13 @@ class FormController extends Controller
                 $validated[$c] = json_encode($request->{$c});
             }
         }
+
+        if(count($unsetFiles) > 0) {
+            foreach($unsetFiles as $f) {
+                unset($validated[$f]);
+            }
+        }
+
         $data = DB::table($form->table_name)->where('user_id', auth()->user()->id)->whereNull('submitted_at')->first();
 
         if(empty($data)) {

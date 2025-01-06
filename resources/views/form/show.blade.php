@@ -80,34 +80,26 @@
                     Swal.showLoading();
                 },
                 success: function(result) {
-
-                    try {
-                        var result = JSON.parse(result);
-                    } catch (err) {
-                        Swal.fire({
-                            title: ':(',
-                            text: 'Server Error ...',
-                            icon: 'error',
-                            confirmButtonText: 'close'
-                        });
-                    }
-
+                    console.log(result);
                     if (result.success === true) {
                         Swal.fire({
-                            text: result.pesan,
+                            text: result.message,
                             icon: 'success',
                             confirmButtonText: 'close',
-                            onClose: redirectToTab(tabIndex)
                         });
                     } else if (result.success === false) {
                         Swal.fire({
-                            text: result.pesan,
+                            text: result.message,
                             icon: 'error',
                             confirmButtonText: 'close'
                         });
                     } else {
                         console.log('parse error!');
                     }
+                },
+                uploadProgress: function(event, position, total, percentComplete) {
+                    var percentVal = percentComplete + '%';
+                    console.log(percentVal);
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
                     let allMessage = '<ul>';
@@ -126,7 +118,6 @@
                         html: allMessage,
                         icon: 'error',
                         confirmButtonText: 'close',
-                        onClose: backToTab(tabIndex)
                     });
                 }
             });

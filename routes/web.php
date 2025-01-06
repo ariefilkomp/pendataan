@@ -6,6 +6,7 @@ use App\Http\Controllers\FormController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\SectionController;
+use App\Http\Controllers\StatController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -39,6 +40,9 @@ Route::middleware('auth')->group(function () {
 
 require __DIR__.'/auth.php';
 
+Route::post('/stat-table', [StatController::class, 'table'])->name('stat-table');
+
+Route::get('/statistik/{form_id}', [StatController::class, 'show'])->name('stat-form');
 Route::get('/{slug}', [FormController::class, 'show'])->name('show-form');
 Route::get('/{slug}/{section_id}', [FormController::class, 'showWithSection'])->name('show-form-with-section');
 Route::post('/form-submit', [FormController::class, 'submit'])->name('form-submit');

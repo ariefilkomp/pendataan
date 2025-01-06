@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Form;
 use App\Models\Question;
+use App\Models\Role;
 use App\Models\Section;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -24,6 +25,13 @@ class DatabaseSeeder extends Seeder
             'email' => 'test@example.com',
         ]);
 
+        Role::create([
+            'name' => 'admin',
+        ]);
+
+        $user->assignRole('admin');
+
+        
         // $form = Form::factory()->create([
         //     'user_id' => $user->id
         // ]);

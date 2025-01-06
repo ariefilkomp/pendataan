@@ -1,10 +1,10 @@
 <div class="mt-4 max-w-xl m-auto bg-slate-100 p-4 rounded">
     <p class="text-gray-700 text-base ">{{ $question?->question }} {!! $question?->is_required ? '<span class="text-red-500">*</span>' : '' !!}</p>
 
-    <div class="flex gap-4">
+    <div class="flex flex-col gap-4">
         @if($question?->type == 'short_answer')
             <x-text-input name="{{ $question?->column_name }}" type="text" class="mt-1 block w-full" autofocus autocomplete="{{ $question?->column_name }}" value="{{ old($question?->column_name, $answers?->{$question?->column_name}) }}" />
-            <x-input-error class="mt-2" :messages="$errors->get( $question?->column_name )" />
+            <x-input-error class="mt-2" :messages="$errors?->submitForm?->get( $question?->column_name )" />
         @endif
         
         @if($question?->type == 'paragraph')

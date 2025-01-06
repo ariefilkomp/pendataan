@@ -3,5 +3,9 @@
 @tailwind utilities;
 
 .dt-length .dt-input {
-    @apply w-14;
+    @apply w-14 text-sm;
+}
+
+#dt-search-0 {
+    @apply text-sm;
 }
