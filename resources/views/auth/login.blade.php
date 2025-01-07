@@ -43,5 +43,16 @@
                 {{ __('Log in') }}
             </x-primary-button>
         </div>
+
+        <div class="flex items-center justify-center mt-8">
+            <p class="text-sm text-gray-600 dark:text-gray-400"> ~ Atau ~ </p>
+        </div>
+
+        <div class="flex items-center justify-center mt-8">
+            <x-secondary-link href="{{ url('/sso/login')}}" class="ms-3">
+                <img src="{{ asset('assets/images/sakti.png')}}" alt="SAKTI" class="ms-3 w-6 h-6">
+                &nbsp; {{ __('Masuk dengan Akun SAKTI') }}
+            </x-secondary-link>
+        </div>
     </form>
 </x-guest-layout>

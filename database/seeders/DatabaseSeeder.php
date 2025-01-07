@@ -29,6 +29,14 @@ class DatabaseSeeder extends Seeder
             'name' => 'admin',
         ]);
 
+        Role::create([
+            'name' => 'umum',
+        ]);
+
+        Role::create([
+            'name' => 'opd',
+        ]);
+
         $user->assignRole('admin');
 
         

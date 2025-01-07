@@ -6,8 +6,8 @@
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
                     <a href="{{ route('dashboard') }}" class="flex items-center">
-                        <img src="/foldericon.png" alt="icon pendataan app" width="32" />
-                        &nbsp; <p class="hidden sm:block font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">Aplikasi Pendataan</p>
+                        <img src="{{ asset('assets/images/sigra-logo-nc.png')}}" alt="icon pendataan app" width="32" />
+                        &nbsp; <p class="hidden sm:block font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">SIGRA</p>
                     </a>
                 </div>
 

@@ -8,6 +8,9 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                <h2 class=" px-6 py-4 font-semibold text-lg text-gray-800 dark:text-gray-200 leading-tight">
+                    {{ __('Available Form') }}
+                </h2>
                 <div class="p-6 text-gray-900 dark:text-gray-100 text-sm">
                     @role('admin')
                     <x-primary-link href="/create-form"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="w-4 h-4 rounded bg-white"><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z"/></svg>
@@ -76,18 +79,18 @@
                                 editLink =
                                     `<a type="button" class="rounded border border-gray-300 bg-white px-2 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50" style="margin:5px;" href="{{ url('/edit-form') }}/` +
                                     row.id +
-                                    `" title="Lihat">edit</a>&nbsp;
+                                    `" title="Lihat">Edit</a>&nbsp;
                                     `;
                                 statLink =
-                                    `<a type="button" class="rounded border border-gray-300 bg-white px-2 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50" style="margin:5px;" href="{{ url('/statistik') }}/` +
+                                    `<a type="button" class="rounded border border-gray-300 bg-white px-2 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50" style="margin:5px;" href="{{ url('/data') }}/` +
                                     row.id +
-                                    `" title="Lihat">Statistik</a>&nbsp;
+                                    `" title="Lihat">Data</a>&nbsp;
                                     `;
                             @endrole
 
                             @role('opd')
                                 statLink =
-                                    `<a type="button" class="rounded border border-gray-300 bg-white px-2 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50" style="margin:5px;" href="{{ url('/statistik') }}/` +
+                                    `<a type="button" class="rounded border border-gray-300 bg-white px-2 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50" style="margin:5px;" href="{{ url('/data') }}/` +
                                     row.id +
                                     `" title="Lihat">Statistik</a>&nbsp;
                                     `;

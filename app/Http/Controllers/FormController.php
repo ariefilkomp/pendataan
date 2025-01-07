@@ -107,10 +107,14 @@ class FormController extends Controller
     }
 
     public function show($slug){
-        $form = Form::where('slug', $slug)->where('published', 1)->first();
-        if(empty($form)){
-            abort(404);  
+        $form = Form::where('slug', $slug)->where('published', 1)->firstOrFail();
+        if(!$form->multi_entry) {
+            $data = DB::table($form->table_name)->where('user_id', auth()->user()->id)->whereNotNull('submitted_at')->first();
+            if($data){
+                return view('form.duplicate-entry');
+            }
         }
+
         $data = DB::table($form->table_name)->where('user_id', auth()->user()->id)->whereNull('submitted_at')->first();
         if(empty($data)){
             DB::table($form->table_name)->insert([
@@ -128,11 +132,9 @@ class FormController extends Controller
     }
 
     public function showWithSection($slug, $section_id){
-        $form = Form::where('slug', $slug)->where('published', 1)->first();
-        $section = $form->sections->where('id', $section_id)->first();
-        if(empty($form) || empty($section)){
-            abort(404);
-        }
+        $form = Form::where('slug', $slug)->where('published', 1)->firstOrFail();
+        $section = $form->sections->where('id', $section_id)->firstOrFail();
+        
         $data = DB::table($form->table_name)->where('user_id', auth()->user()->id)->whereNull('submitted_at')->first();
         return view('form.show', [
             'form' => $form,

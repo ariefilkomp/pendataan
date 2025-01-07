@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FileController;
 use App\Http\Controllers\FormController;
@@ -13,6 +14,8 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/sso/callback', [AuthController::class, 'ssoCallback'])->name('ssoCallback');
+Route::get('/sso/login', [AuthController::class, 'ssoLogin'])->name('ssoLogin');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -42,8 +45,10 @@ require __DIR__.'/auth.php';
 
 Route::post('/stat-table', [StatController::class, 'table'])->name('stat-table');
 
-Route::get('/statistik/{form_id}', [StatController::class, 'show'])->name('stat-form');
-Route::get('/{slug}', [FormController::class, 'show'])->name('show-form');
-Route::get('/{slug}/{section_id}', [FormController::class, 'showWithSection'])->name('show-form-with-section');
+Route::get('/download/{id}', [StatController::class, 'xlsx'])->name('download');
+Route::get('/data/{form_id}', [StatController::class, 'show'])->name('stat-form');
 Route::post('/form-submit', [FormController::class, 'submit'])->name('form-submit');
 Route::post('/upload-file', [FileController::class, 'upload'])->name('upload-file');
+
+Route::get('/{slug}', [FormController::class, 'show'])->name('show-form');
+Route::get('/{slug}/{section_id}', [FormController::class, 'showWithSection'])->name('show-form-with-section');
