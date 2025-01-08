@@ -36,6 +36,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::post('/add-question', [QuestionController::class, 'store'])->name('add-question');
     Route::post('/update-question', [QuestionController::class, 'update'])->name('update-question');
+
+    Route::post('/stat-table', [StatController::class, 'table'])->name('stat-table');
+    Route::get('/download/{id}', [StatController::class, 'xlsx'])->name('download');
+    Route::get('/data/{form_id}', [StatController::class, 'show'])->name('stat-form');
+    Route::post('/form-submit', [FormController::class, 'submit'])->name('form-submit');
+    Route::post('/upload-file', [FileController::class, 'upload'])->name('upload-file');
 });
 
 Route::middleware('auth')->group(function () {
@@ -45,13 +51,6 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__.'/auth.php';
-
-Route::post('/stat-table', [StatController::class, 'table'])->name('stat-table');
-
-Route::get('/download/{id}', [StatController::class, 'xlsx'])->name('download');
-Route::get('/data/{form_id}', [StatController::class, 'show'])->name('stat-form');
-Route::post('/form-submit', [FormController::class, 'submit'])->name('form-submit');
-Route::post('/upload-file', [FileController::class, 'upload'])->name('upload-file');
 
 Route::get('/{slug}', [FormController::class, 'show'])->name('show-form');
 Route::get('/{slug}/{section_id}', [FormController::class, 'showWithSection'])->name('show-form-with-section');

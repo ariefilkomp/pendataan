@@ -66,7 +66,7 @@ class AuthController extends Controller
             'response_type' => 'code',
             'client_id' => env('SSO_CLIENT_ID','paklay'),
             'redirect_uri' => env('SSO_CALLBACK_URI', 'https://newpaklay.test/sso/callback'),
-            'scopes' => 'user kependudukan',
+            'scopes' => 'user',
             'state' => $state
         );
         
