@@ -22,7 +22,8 @@ return new class extends Migration
             $table->boolean('multi_entry')->default(true);
             $table->enum('for_role', ['umum', 'opd'])->default('umum');
             $table->integer('id_opds')->nullable();
-            $table->string('short_url')->nullable();
+            $table->string('short_slug')->nullable();
+            $table->string('short_id')->nullable();
             $table->timestamps();
         });
     }

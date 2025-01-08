@@ -1,6 +1,7 @@
 <section>
     <div class="mt-6 px-2">
-        <p class="text-gray-700 text-base">{{ $form->sections->where('id', $section_id)->first()->description }}</p>
+        <p class="text-gray-700 text-base">{{ $form->sections->where('id', $section_id)->first()?->description }}</p>
+        @if($form->sections->count() > 0)
         <form method="post" action="{{ route('add-question') }}" class="p-6" x-data="dynamicForm()">
             @if (session('status') === 'question-updated')
                 <p
@@ -191,6 +192,7 @@
                 function setUpdateData(data) {
 
                     $('#question_id_update').val(data.id);
+                    $('#question_id_delete').val(data.id);
                     $('#question_update').val(data.question);
                     $('#column_name_update').val(data.column_name);
                     $('#type_update').val(data.type);
@@ -224,6 +226,7 @@
             </script>
 
         </form>
+        @endif
     </div>
 </section>
 
@@ -267,11 +270,11 @@
         @method('delete')
 
         <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
-            {{ __('Anda yakin untuk menghapus section : ' . $form->sections->where('id', $section_id)->first()->name . '?') }}
+            {{ __('Anda yakin untuk menghapus section : ' . $form->sections->where('id', $section_id)->first()?->name . '?') }}
         </h2>
 
         <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-            {{ __('Once your account is deleted, all of its resources and data will be permanently deleted.') }}
+            {{ __('Once your section is deleted, all of its resources and data will be permanently deleted.') }}
         </p>
 
         <input type="hidden" name="section_id" value="{{ $section_id }}">
@@ -288,7 +291,20 @@
 </x-modal>
 
 <x-modal name="edit-question-modal" :show="$errors->updateQuestion->isNotEmpty()" focusable>
-    <form method="post" action="{{ route('update-question') }}" class="p-6" x-data="dynamicFormUpdate()">
+    <div class="flex justify-between px-6 pt-6">
+        <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
+            {{ __('Update Question') }}
+        </h2>
+        <form method="post" action="{{ route('delete-question') }}" onsubmit="return confirm('Are you sure you want to delete this question?');">
+            @csrf
+            @method('delete')
+            <input type="hidden" name="question_id" value="" id="question_id_delete">
+            <x-danger-button class="ms-3">
+                {{ __('Delete Question') }}
+            </x-danger-button>
+        </form>
+    </div>
+    <form method="post" action="{{ route('update-question') }}" class="px-6 pb-6" x-data="dynamicFormUpdate()">
         @if ($errors->addQuestion->isNotEmpty())
             @foreach ($errors->addQuestion->all() as $message)
                 <p class="text-red-500 text-sm">{{ $message }}</p>
@@ -299,10 +315,7 @@
         @csrf
         <input type="hidden" name="form_id" value="{{ $form->id }}">
         <input type="hidden" name="section_id" value="{{ $section_id }}">
-        <input type="hidden" name="question_id" value="" id="question_id_update">
-        <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
-            {{ __('Update Question') }}
-        </h2>
+        <input type="hidden" name="question_id" value="" id="question_id_update"> 
 
         <div class="mt-4">
             <x-input-label for="question_update" :value="__('Question *')" />
@@ -405,6 +418,42 @@
             }
         </script>
 
+    </form>
+</x-modal>
+
+<x-modal name="edit-section-modal" :show="$errors->updateSection->isNotEmpty()" focusable>
+    <form method="post" action="{{ route('edit-section') }}" class="p-6">
+        @method('patch')
+        @csrf
+        <input type="hidden" name="form_id" value="{{ $form->id }}">
+        <input type="hidden" name="section_id" value="{{ $section_id }}">
+        <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
+            {{ __('Edit Section') }}
+        </h2>
+
+        <div>
+            <x-input-label for="name" :value="__('Section Name')" />
+            <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name',$form->sections->where('id', $section_id)->first()?->name)"
+                required autofocus autocomplete="name" />
+            <x-input-error class="mt-2" :messages="$errors->get('name')" />
+        </div>
+
+        <div>
+            <x-input-label for="description" :value="__('Description')" />
+            <x-textarea-input id="description" name="description" type="text" class="mt-1 block w-full" required
+                autofocus autocomplete="description">{{ old('description',$form->sections->where('id', $section_id)->first()?->description) }}</x-textarea-input>
+            <x-input-error class="mt-2" :messages="$errors->get('description')" />
+        </div>
+
+        <div class="mt-6 flex justify-end">
+            <x-secondary-button x-on:click="$dispatch('close')">
+                {{ __('Cancel') }}
+            </x-secondary-button>
+
+            <x-primary-button class="ms-3">
+                {{ __('Save') }}
+            </x-primary-button>
+        </div>
     </form>
 </x-modal>
 

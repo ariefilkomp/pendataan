@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Models\Form;
 use App\Models\Section;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 
@@ -34,6 +35,10 @@ class FormController extends Controller
             'description' => 'required',
             'table_name' => 'nullable|unique:forms,table_name',
             'slug' => 'nullable|unique:forms,slug',
+            'short_url' => 'nullable|numeric',
+            'multi_entry' => 'nullable|numeric',
+            'published' => 'nullable|numeric',
+            'for_role' => 'required'
         ]);
 
         $routeCollection = collect(Route::getRoutes()->get())->unique();
@@ -53,6 +58,20 @@ class FormController extends Controller
             $request->slug = Str::slug($request->slug,'-');
         }
 
+        $shortSlug = null;
+        $shortId = null;
+        if($request->short_url) {
+            $response = Http::acceptJson()->withBody(json_encode(['long_url' => url('/'.$request->slug), 'title' => $request->name]))->withHeaders([
+                'X-Auth-Id' =>  env('SID_AUTH_ID'),
+                'X-Auth-Key' => env('SID_AUTH_KEY'), 
+           ])->post('https://api.s.id/v1/links');
+        
+           if($response->successful()) {
+                $shortSlug = $response->json()['data']['short'];
+                $shortId = $response->json()['data']['id'];
+           }
+        }
+
         $form = new Form();
         $form->id = $uuid;
         $form->user_id = auth()->user()->id;
@@ -60,6 +79,12 @@ class FormController extends Controller
         $form->description = $request->description;
         $form->table_name = $request->table_name;
         $form->slug = $request->slug;
+        $form->published = $request->published == '1' ? 1 : 0;
+        $form->multi_entry = $request->multi_entry == '1' ? 1 : 0;
+        $form->for_role = $request->for_role;
+        $form->short_slug = $shortSlug;
+        $form->short_id = $shortId;
+
         if($form->save()) {
             Section::create([
                 'id' => Str::uuid(),
@@ -78,7 +103,7 @@ class FormController extends Controller
         $form = Form::findOrFail($id);
         return view('form.update-mainform', [
             'form' => $form,
-            'section_id' => $form->sections->sortBy('order', SORT_NUMERIC)->first()->id,
+            'section_id' => $form->sections?->sortBy('order', SORT_NUMERIC)->first()?->id,
             'optType' => $this->optType
         ]);
     }
@@ -95,12 +120,58 @@ class FormController extends Controller
     public function update(Request $request){
         $form = Form::findOrFail($request->id);
         $oldTableName = $form->table_name;
-        $form->fill($request->all());
-
-        if($form->isDirty('table_name')) {
+        $oldSlug = $form->slug;
+        
+        if($oldTableName != $request->table_name) {
             $form->table_name = Str::snake(trim(strtolower($request->table_name)));
             DB::statement('RENAME TABLE `' . $oldTableName . '` TO `' . $form->table_name .'`');
         }
+
+        if($oldSlug != $request->slug && isset($form->short_id)) {
+            $newSlug = Str::slug($request->slug,'-');
+
+            /* 
+                idealnya, 
+                bisa update short urlnya, tapi karena s.id api update tidak support untuk akun free, 
+                maka ya mau gak mau bikin lagi urlnya..
+                dibawah ini buat update short url
+            */ 
+
+            /*
+                $form->slug = $newSlug;
+                $response = Http::acceptJson()->withBody(json_encode(
+                    [
+                        'long_url' => url('/'.$newSlug),
+                        'short' => $form->short_slug,
+                        'title' => $request->name
+                    ]))->withHeaders([
+                    'X-Auth-Id' =>  env('SID_AUTH_ID'),
+                    'X-Auth-Key' => env('SID_AUTH_KEY'), 
+                ])->post('https://api.s.id/v1/links/'.$form->short_id);
+
+                var_dump($response->body());
+                var_dump($response->json());
+                dd($response);
+            */
+
+            /* bikin short url lagi */
+            $response = Http::acceptJson()->withBody(json_encode(['long_url' => url('/'.$newSlug), 'title' => $request->name]))->withHeaders([
+                'X-Auth-Id' =>  env('SID_AUTH_ID'),
+                'X-Auth-Key' => env('SID_AUTH_KEY'), 
+            ])->post('https://api.s.id/v1/links');
+        
+            if($response->successful()) {
+                $form->slug = $newSlug;
+                $form->short_slug = $response->json()['data']['short'];
+                $form->short_id = $response->json()['data']['id'];
+            }
+        }
+
+        $form->name = $request->name;
+        $form->description = $request->description;
+        $form->published = $request->published == '1' ? 1 : 0;
+        $form->multi_entry = $request->multi_entry == '1' ? 1 : 0;
+        $form->for_role = $request->for_role;
 
         $form->save();
         return redirect()->back()->with('status', 'form-updated');
@@ -115,6 +186,15 @@ class FormController extends Controller
             }
         }
 
+        if(auth()->guest()) {
+            session()->put('url.intended', url($form->slug));
+            return view('form.must-login');
+        }
+
+        if($form->for_role == 'opd' && !auth()->user()->hasAnyRole(['opd', 'admin'])) {
+            return abort(404);
+        }
+
         $data = DB::table($form->table_name)->where('user_id', auth()->user()->id)->whereNull('submitted_at')->first();
         if(empty($data)){
             DB::table($form->table_name)->insert([
@@ -125,7 +205,7 @@ class FormController extends Controller
         }
         return view('form.show', [
             'form' => $form,
-            'section' => $form->sections->sortBy('order', SORT_NUMERIC)->first(),
+            'section' => $form->sections?->sortBy('order', SORT_NUMERIC)->first(),
             'optType' => $this->optType,
             'data' => $data
         ]);
@@ -133,7 +213,22 @@ class FormController extends Controller
 
     public function showWithSection($slug, $section_id){
         $form = Form::where('slug', $slug)->where('published', 1)->firstOrFail();
-        $section = $form->sections->where('id', $section_id)->firstOrFail();
+        $section = $form->sections?->where('id', $section_id)->firstOrFail();
+        if(!$form->multi_entry) {
+            $data = DB::table($form->table_name)->where('user_id', auth()->user()->id)->whereNotNull('submitted_at')->first();
+            if($data){
+                return view('form.duplicate-entry');
+            }
+        }
+
+        if(auth()->guest()) {
+            session()->put('url.intended', url($form->slug));
+            return view('form.must-login');
+        }
+
+        if($form->for_role == 'opd' && !auth()->user()->hasAnyRole(['opd', 'admin'])) {
+            return abort(404);
+        }
         
         $data = DB::table($form->table_name)->where('user_id', auth()->user()->id)->whereNull('submitted_at')->first();
         return view('form.show', [
@@ -156,7 +251,7 @@ class FormController extends Controller
         $checkbox = [];
         $unsetFiles = [];
         foreach($questions as $question) {
-            $filter = $question->is_required ? 'required' : 'nullable';
+            $filter = $question->is_required && $question->type != 'file' ? 'required' : 'nullable';
             $validation[$question->column_name] = $filter;
             if($question->type == 'checkboxes' ) {
                 $checkbox[] = $question->column_name;

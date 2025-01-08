@@ -19,8 +19,10 @@
                     <table id="dashboardTable">
                         <thead>
                             <tr>
+                                @if(auth()->user()->hasAnyRole(['admin', 'opd']))
                                 <th>Nama Tabel</th>
                                 <th>Slug</th>
+                                @endif
                                 <th>Nama Form</th>
                                 <th>Deskripsi</th>
                                 <th>Aksi</th>
@@ -50,6 +52,7 @@
                 },
                 "columnDefs": [],
                 "columns": [
+                    @if(auth()->user()->hasAnyRole(['admin', 'opd']))
                     {
                         "render": function(data, type, row, meta) {
                             return row.table_name;
@@ -60,6 +63,7 @@
                             return row.slug;
                         }
                     },
+                    @endif
                     {
                         "render": function(data, type, row, meta) {
                             return row.name;

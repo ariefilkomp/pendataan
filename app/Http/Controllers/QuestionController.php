@@ -120,4 +120,13 @@ class QuestionController extends Controller
 
         return redirect()->route('edit-form-section', [ "id" => $request->form_id, "section_id" => $request->section_id])->with('status', 'question-updated');
     }
+
+    public function delete(Request $request) 
+    {
+        $question = Question::findOrFail($request->question_id);
+        if($question->delete()) {
+            DB::statement("ALTER TABLE `{$question->form->table_name}` DROP COLUMN `{$question->column_name}`");
+        }
+        return redirect()->back()->with('status', 'question-deleted');
+    }
 }

@@ -28,6 +28,7 @@
                         @php 
                             $classStyle = $section->order == 1 ? "justify-end" : "justify-between";
                             $backSectionId = $section->order > 0 ? $form->sections->where('order', $section->order - 1)->first()?->id : '#';
+                            $nextStr = $form->sections->where('order', $section->order)->first()?->order == $form->sections->count() ? 'Submit' : 'Next >';
                         @endphp
                         <div class="p-4 max-w-xl m-auto flex {{$classStyle}}">
                             @if($section->order > 1)
@@ -36,7 +37,7 @@
                                 </x-secondary-link>
                             @endif
                             <x-primary-button type="submit" class="mt-4">
-                                {{ __('Next >') }}
+                                {{ __($nextStr) }}
                             </x-primary-button>
                         </div>
                     @endif

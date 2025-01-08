@@ -37,7 +37,7 @@ class AuthController extends Controller
                     $user = User::where('email', $res->json()['email'])->first();
                     if ($user) {
                         Auth::login($user);
-                        return redirect('/dashboard');
+                        return redirect()->intended(route('dashboard', absolute: false));
                     } else {
                         $user = User::create([
                             'name' => $res->json()['nama'],
@@ -48,7 +48,7 @@ class AuthController extends Controller
                         $user->assignRole('umum');
 
                         Auth::login($user);
-                        return redirect('/dashboard');
+                        return redirect()->intended(route('dashboard', absolute: false));
                     }
                 } else {
                     return view('auth.sso-state-error');
