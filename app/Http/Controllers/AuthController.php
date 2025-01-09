@@ -42,6 +42,7 @@ class AuthController extends Controller
                         $user = User::create([
                             'name' => $res->json()['nama'],
                             'email' => $res->json()['email'],
+                            'email_verified_at' => now(),
                             'password' => bcrypt(env('DEFAULT_PASSWORD', 'ssodebugKMZWAY87AA')),
                         ]);
 

@@ -21,27 +21,31 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('/dashboard', [DashboardController::class, 'gettable']);
 
-    Route::get('/create-form', [FormController::class, 'create'])->name('create-form');
-    Route::post('/create-form', [FormController::class, 'store']);
-    
-    Route::get('/edit-form/{id}', [FormController::class, 'edit'])->name('edit-form');
-    Route::patch('/edit-form', [FormController::class, 'update']);
-    Route::get('/edit-form/{id}/{section_id}', [FormController::class, 'editWithSection'])->name('edit-form-section');
-
-    Route::delete('/delete-question', [QuestionController::class, 'delete'])->name('delete-question');
-
-    Route::post('/add-section', [SectionController::class, 'store'])->name('add-section');
-    Route::patch('/edit-section', [SectionController::class, 'update'])->name('edit-section');
-    Route::delete('/delete-section', [SectionController::class, 'destroy'])->name('delete-section');
-
-    Route::post('/add-question', [QuestionController::class, 'store'])->name('add-question');
-    Route::post('/update-question', [QuestionController::class, 'update'])->name('update-question');
-
-    Route::post('/stat-table', [StatController::class, 'table'])->name('stat-table');
-    Route::get('/download/{id}', [StatController::class, 'xlsx'])->name('download');
-    Route::get('/data/{form_id}', [StatController::class, 'show'])->name('stat-form');
     Route::post('/form-submit', [FormController::class, 'submit'])->name('form-submit');
     Route::post('/upload-file', [FileController::class, 'upload'])->name('upload-file');
+    
+    Route::middleware(['role:admin'])->group(function () {
+        Route::get('/create-form', [FormController::class, 'create'])->name('create-form');
+        Route::post('/create-form', [FormController::class, 'store']);
+        
+        Route::get('/edit-form/{id}', [FormController::class, 'edit'])->name('edit-form');
+        Route::patch('/edit-form', [FormController::class, 'update']);
+        Route::get('/edit-form/{id}/{section_id}', [FormController::class, 'editWithSection'])->name('edit-form-section');
+
+        Route::delete('/delete-question', [QuestionController::class, 'delete'])->name('delete-question');
+
+        Route::post('/add-section', [SectionController::class, 'store'])->name('add-section');
+        Route::patch('/edit-section', [SectionController::class, 'update'])->name('edit-section');
+        Route::delete('/delete-section', [SectionController::class, 'destroy'])->name('delete-section');
+
+        Route::post('/add-question', [QuestionController::class, 'store'])->name('add-question');
+        Route::post('/update-question', [QuestionController::class, 'update'])->name('update-question');
+
+        Route::post('/stat-table', [StatController::class, 'table'])->name('stat-table');
+        Route::get('/download/{id}', [StatController::class, 'xlsx'])->name('download');
+        Route::get('/data/{form_id}', [StatController::class, 'show'])->name('stat-form');
+    });
+
 });
 
 Route::middleware('auth')->group(function () {
