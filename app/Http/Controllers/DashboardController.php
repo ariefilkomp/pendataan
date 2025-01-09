@@ -31,6 +31,10 @@ class DashboardController extends Controller
             $data = $data->where('for_role', 'umum');
         }
 
+        if(!auth()->user()->hasRole('admin')) {
+            $data = $data->where('published', 1);
+        }
+
         if(request()->input('search.value')) {
             $data = $data->where( function($query) {
                 $query->orWhereRaw('table_name LIKE ?', ['%'.request()->input('search.value').'%'])
