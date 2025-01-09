@@ -1,5 +1,9 @@
 <x-common-layout>
-    
+    @push('head')
+        <meta name="description" content="{{ $form?->description }}" itemprop="description" />
+        <meta name="title" content="{{ $form?->name }}" />
+        <meta name="originalTitle" content="{{ $form?->name }}" />
+    @endpush
     <section class="relative">
         <div class="relative pt-24 lg:pt-28">
             <div class="mx-auto px-6 max-w-7xl md:px-12">
