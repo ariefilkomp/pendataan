@@ -53,7 +53,7 @@
                 <div class="mt-4">
                     <x-input-label for="column_name" :value="__('Column Name')" />
                     <x-text-input id="column_name" name="column_name" type="text" class="mt-1 block w-full"
-                        :value="old('column_name')" autofocus autocomplete="column_name" />
+                        :value="old('column_name')" autofocus autocomplete="column_name" placeholder="boleh dikosongkan" />
                     <x-input-error class="mt-2" :messages="$errors->get('column_name')" />
                 </div>
 
@@ -328,7 +328,7 @@
             <div class="mt-4">
                 <x-input-label for="column_name_update" :value="__('Column Name')" />
                 <x-text-input id="column_name_update" name="column_name" type="text" class="mt-1 block w-full"
-                    :value="old('column_name')" autofocus autocomplete="column_name" />
+                    :value="old('column_name')" autofocus autocomplete="column_name" placeholder="boleh dikosongkan" />
                 <x-input-error class="mt-2" :messages="$errors->get('column_name')" />
             </div>
 

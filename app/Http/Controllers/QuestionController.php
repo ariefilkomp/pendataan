@@ -18,7 +18,7 @@ class QuestionController extends Controller
             'question' => 'required',
             'type' => 'required|in:short_answer,paragraph,multiple_choice,checkboxes,dropdown,file,date,time',
             'options' => 'required_if:type,checkboxes,dropdown,multiple_choice',
-            'column_name' => 'nullable',
+            'column_name' => 'nullable|string|min:3',
             'is_required' => 'nullable',
         ]);
 
