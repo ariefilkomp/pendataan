@@ -8,6 +8,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\SectionController;
 use App\Http\Controllers\StatController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -44,6 +45,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/stat-table', [StatController::class, 'table'])->name('stat-table');
         Route::get('/download/{id}', [StatController::class, 'xlsx'])->name('download');
         Route::get('/data/{form_id}', [StatController::class, 'show'])->name('stat-form');
+
+        Route::get('/admin/users', [UserController::class, 'index'])->name('admin.users.index');
+        Route::post('/admin/users', [UserController::class, 'table'])->name('admin.users.table');
+        Route::patch('/edit-role', [UserController::class, 'updateRole'])->name('edit-role');
     });
 
 });

@@ -54,7 +54,7 @@
                     <x-input-label for="column_name" :value="__('Column Name')" />
                     <x-text-input id="column_name" name="column_name" type="text" class="mt-1 block w-full"
                         :value="old('column_name')" autofocus autocomplete="column_name" placeholder="boleh dikosongkan" />
-                    <x-input-error class="mt-2" :messages="$errors->get('column_name')" />
+                    <x-input-error class="mt-2" :messages="$errors->addQuestion->get('column_name')" />
                 </div>
 
                 <div class="mt-4">
@@ -242,14 +242,14 @@
             <x-input-label for="name" :value="__('Section Name')" />
             <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name')"
                 required autofocus autocomplete="name" />
-            <x-input-error class="mt-2" :messages="$errors->get('name')" />
+            <x-input-error class="mt-2" :messages="$errors->addSection->get('name')" />
         </div>
 
         <div>
             <x-input-label for="description" :value="__('Description')" />
             <x-textarea-input id="description" name="description" type="text" class="mt-1 block w-full" required
                 autofocus autocomplete="description">{{ old('description') }}</x-textarea-input>
-            <x-input-error class="mt-2" :messages="$errors->get('description')" />
+            <x-input-error class="mt-2" :messages="$errors->addSection->get('description')" />
         </div>
 
         <div class="mt-6 flex justify-end">
@@ -321,7 +321,7 @@
             <x-input-label for="question_update" :value="__('Question *')" />
             <x-textarea-input id="question_update" name="question" type="text" class="mt-1 block w-full" required
                 autofocus autocomplete="question">{{ old('question') }}</x-textarea-input>
-            <x-input-error class="mt-2" :messages="$errors->get('question')" />
+            <x-input-error class="mt-2" :messages="$errors->updateQuestion->get('question')" />
         </div>
 
         <div class="flex gap-8">
@@ -329,7 +329,7 @@
                 <x-input-label for="column_name_update" :value="__('Column Name')" />
                 <x-text-input id="column_name_update" name="column_name" type="text" class="mt-1 block w-full"
                     :value="old('column_name')" autofocus autocomplete="column_name" placeholder="boleh dikosongkan" />
-                <x-input-error class="mt-2" :messages="$errors->get('column_name')" />
+                <x-input-error class="mt-2" :messages="$errors->updateQuestion->get('column_name')" />
             </div>
 
             <div class="mt-4">
@@ -341,7 +341,7 @@
                             {{ $value }}</option>
                     @endforeach
                 </x-select-input>
-                <x-input-error class="mt-2" :messages="$errors->get('type')" />
+                <x-input-error class="mt-2" :messages="$errors->updateQuestion->get('type')" />
             </div>
             <div class="mt-4">
                 <label class="cursor-pointer">
@@ -362,7 +362,7 @@
                 </div>
                 <button type="button" id="addInput_update"
                     class="text-xs rounded mt-2 p-2 border border-collapse w-24 ">Add Input</button>
-                <x-input-error class="mt-2" :messages="$errors->get('options')" />
+                <x-input-error class="mt-2" :messages="$errors->updateQuestion->get('options')" />
             </div>
         </div>
 
@@ -435,14 +435,14 @@
             <x-input-label for="name" :value="__('Section Name')" />
             <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name',$form->sections->where('id', $section_id)->first()?->name)"
                 required autofocus autocomplete="name" />
-            <x-input-error class="mt-2" :messages="$errors->get('name')" />
+            <x-input-error class="mt-2" :messages="$errors->updateSection->get('name')" />
         </div>
 
         <div>
             <x-input-label for="description" :value="__('Description')" />
             <x-textarea-input id="description" name="description" type="text" class="mt-1 block w-full" required
                 autofocus autocomplete="description">{{ old('description',$form->sections->where('id', $section_id)->first()?->description) }}</x-textarea-input>
-            <x-input-error class="mt-2" :messages="$errors->get('description')" />
+            <x-input-error class="mt-2" :messages="$errors->updateSection->get('description')" />
         </div>
 
         <div class="mt-6 flex justify-end">
