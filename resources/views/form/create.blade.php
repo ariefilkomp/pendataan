@@ -58,17 +58,19 @@
                                 <x-input-error class="mt-2" :messages="$errors->get('multi_entry')" />
                             </div>
 
+                            @role('admin')
                             <div>
                                 <label class="cursor-pointer">
                                     <span class="block font-medium text-sm text-gray-700 dark:text-gray-300">Published</span>
                                     <input type="checkbox" id="published" value="1"
-                                        name="published" class="sr-only peer" checked>
+                                        name="published" class="sr-only peer">
                                     <div
                                         class="mt-2 relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600">
                                     </div>
                                 </label>
                                 <x-input-error class="mt-2" :messages="$errors->get('published')" />
                             </div>
+                            @endrole
 
                             <div>
                                 <x-input-label for="table_name" :value="__('Nama Tabel, format Alphanumeric underscore. contoh : tabel_saya')" />
@@ -88,7 +90,7 @@
                                 <label class="cursor-pointer">
                                     <span class="block font-medium text-sm text-gray-700 dark:text-gray-300">Auto create short url</span>
                                     <input type="checkbox" id="short_url" value="1"
-                                        name="short_url" class="sr-only peer" checked>
+                                        name="short_url" class="sr-only peer">
                                     <div
                                         class="mt-2 relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600">
                                     </div>

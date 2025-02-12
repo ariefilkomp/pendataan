@@ -101,6 +101,10 @@ class FormController extends Controller
 
     public function edit($id){
         $form = Form::findOrFail($id);
+        if($form->user_id != auth()->user()->id && !auth()->user()->hasRole('admin')) {
+            return abort(403);
+        }
+
         return view('form.update-mainform', [
             'form' => $form,
             'section_id' => $form->sections?->sortBy('order', SORT_NUMERIC)->first()?->id,
@@ -110,6 +114,10 @@ class FormController extends Controller
 
     public function editWithSection($id, $section_id){
         $form = Form::findOrFail($id);
+        if($form->user_id != auth()->user()->id && !auth()->user()->hasRole('admin')) {
+            return abort(403);
+        }
+
         return view('form.update-mainform', [
             'form' => $form,
             'section_id' => $section_id,
@@ -178,7 +186,7 @@ class FormController extends Controller
     }
 
     public function show($slug){
-        $form = Form::where('slug', $slug)->where('published', 1)->firstOrFail();
+        $form = Form::where('slug', $slug)->where('published', 1)->where('status','approved')->firstOrFail();
         if(!$form->multi_entry) {
             $data = DB::table($form->table_name)->where('user_id', auth()->user()->id)->whereNotNull('submitted_at')->first();
             if($data){
@@ -212,7 +220,7 @@ class FormController extends Controller
     }
 
     public function showWithSection($slug, $section_id){
-        $form = Form::where('slug', $slug)->where('published', 1)->firstOrFail();
+        $form = Form::where('slug', $slug)->where('published', 1)->where('status','approved')->firstOrFail();
         $section = $form->sections?->where('id', $section_id)->firstOrFail();
         if(!$form->multi_entry) {
             $data = DB::table($form->table_name)->where('user_id', auth()->user()->id)->whereNotNull('submitted_at')->first();
@@ -299,5 +307,67 @@ class FormController extends Controller
             $nextSection = $form->sections->where('order', $section->order + 1)->first();
             return redirect('/'.$form->slug.'/'.$nextSection->id)->with('status', 'form-submitted');
         }
+    }
+
+    public function forms() {
+        return view('form.forms');
+    }
+
+    public function gettable(Request $request) {
+        $columns = array(
+            "id",
+            "table_name",
+            "name",
+            "description",
+        );
+    
+        $orderBy = empty(request()->input("order.0.column")) ? 'id' : (isset($columns[request()->input("order.0.column")]) ? $columns[request()->input("order.0.column")] : 'id');
+        $ord = empty(request()->input("order.0.dir")) ? 'desc' : request()->input("order.0.dir");
+        
+        $data = Form::with('sections');
+
+        if(!auth()->user()->hasAnyRole(['admin', 'opd'])) {
+            $data = $data->where('for_role', 'umum');
+        }
+
+        if(!auth()->user()->hasAnyRole(['admin'])) {
+            $data = $data->where('user_id', auth()->user()->id);
+        }
+
+        if(request()->input('search.value')) {
+            $data = $data->where( function($query) {
+                $query->orWhereRaw('table_name LIKE ?', ['%'.request()->input('search.value').'%'])
+                    ->orWhereRaw('name LIKE ?', ['%'.request()->input('search.value').'%'])
+                    ->orWhereRaw('description LIKE ?', ['%'.request()->input('search.value').'%']);
+            });
+        }
+
+        $recordsFiltered = $data->get()->count();
+       
+        $data = $data->skip(request()->input('start'))
+            ->take(request()->input('length'))
+            ->orderBy($orderBy, $ord)
+            ->get();
+
+        $recordsTotal = $data->count();
+
+        return response()->json([
+            'draw' => request()->input('draw'),
+            'recordsTotal' => (int)$recordsTotal,
+            'recordsFiltered' => (int)$recordsFiltered,
+            'data' => $data
+        ]);
+    }
+
+    public function formApproval(Request $request) {
+        $request->validate([
+            'id' => 'required',
+            'status' => 'required|in:draft,submitted,approved,rejected'
+        ]);
+
+        $form = Form::findOrFail($request->id);
+        $form->status = $request->status;
+        $form->save();
+        return redirect()->back()->with('status', 'form-approval');
     }
 }

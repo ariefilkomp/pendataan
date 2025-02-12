@@ -9,6 +9,7 @@ use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\SectionController;
 use App\Http\Controllers\StatController;
 use App\Http\Controllers\UserController;
+use App\Models\Form;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -21,11 +22,14 @@ Route::get('/sso/login', [AuthController::class, 'ssoLogin'])->name('ssoLogin');
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('/dashboard', [DashboardController::class, 'gettable']);
+    
+    Route::get('/forms', [FormController::class, 'forms'])->name('forms');
+    Route::post('/forms', [FormController::class, 'gettable']);
 
     Route::post('/form-submit', [FormController::class, 'submit'])->name('form-submit');
     Route::post('/upload-file', [FileController::class, 'upload'])->name('upload-file');
     
-    Route::middleware(['role:admin'])->group(function () {
+    Route::middleware(['role:admin|opd'])->group(function () {
         Route::get('/create-form', [FormController::class, 'create'])->name('create-form');
         Route::post('/create-form', [FormController::class, 'store']);
         
@@ -45,10 +49,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/stat-table', [StatController::class, 'table'])->name('stat-table');
         Route::get('/download/{id}', [StatController::class, 'xlsx'])->name('download');
         Route::get('/data/{form_id}', [StatController::class, 'show'])->name('stat-form');
+    });
 
+    Route::middleware(['role:admin'])->group(function () {
         Route::get('/admin/users', [UserController::class, 'index'])->name('admin.users.index');
         Route::post('/admin/users', [UserController::class, 'table'])->name('admin.users.table');
         Route::patch('/edit-role', [UserController::class, 'updateRole'])->name('edit-role');
+        Route::post('/form-approval', [FormController::class, 'formApproval'])->name('form-approval');
     });
 
 });

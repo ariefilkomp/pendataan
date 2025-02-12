@@ -25,14 +25,10 @@ class DashboardController extends Controller
         $orderBy = empty(request()->input("order.0.column")) ? 'id' : (isset($columns[request()->input("order.0.column")]) ? $columns[request()->input("order.0.column")] : 'id');
         $ord = empty(request()->input("order.0.dir")) ? 'desc' : request()->input("order.0.dir");
         
-        $data = Form::with('sections');
+        $data = Form::with('sections')->where('published', 1)->where('status', 'approved');
 
         if(!auth()->user()->hasAnyRole(['admin', 'opd'])) {
             $data = $data->where('for_role', 'umum');
-        }
-
-        if(!auth()->user()->hasRole('admin')) {
-            $data = $data->where('published', 1);
         }
 
         if(request()->input('search.value')) {
