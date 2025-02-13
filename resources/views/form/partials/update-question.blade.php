@@ -25,7 +25,7 @@
 
             @foreach ($form->questions->sortBy('created_at') as $question)
                 @if ($question->section_id == $section_id)
-                    <x-question-card :question="$question" />
+                    <x-question-card :question="$question" :disabled="$form->status == 'submitted' || $form->status == 'approved'"/>
                 @endif
             @endforeach
             @if ($errors->addQuestion->isNotEmpty())
@@ -38,73 +38,75 @@
             @csrf
             <input type="hidden" name="form_id" value="{{ $form->id }}">
             <input type="hidden" name="section_id" value="{{ $section_id }}">
-            <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100 mt-4">
-                {{ __('Add Question') }}
-            </h2>
 
-            <div class="mt-4">
-                <x-input-label for="question" :value="__('Question *')" />
-                <x-textarea-input id="question" name="question" type="text" class="mt-1 block w-full" required
-                    autofocus autocomplete="question">{{ old('question') }}</x-textarea-input>
-                <x-input-error class="mt-2" :messages="$errors->get('question')" />
-            </div>
-
-            <div class="flex gap-8">
-                <div class="mt-4">
-                    <x-input-label for="column_name" :value="__('Column Name')" />
-                    <x-text-input id="column_name" name="column_name" type="text" class="mt-1 block w-full"
-                        :value="old('column_name')" autofocus autocomplete="column_name" placeholder="boleh dikosongkan" />
-                    <x-input-error class="mt-2" :messages="$errors->addQuestion->get('column_name')" />
-                </div>
-
-                <div class="mt-4">
-                    <x-input-label for="type" :value="__('Type')" />
-                    <x-select-input name="type" class="mt-1 block w-full"
-                        x-on:change="typeChange($event.target.value)">
-                        @foreach ($optType as $key => $value)
-                            <option value="{{ $key }}" {{ old('type') == $key ? 'selected' : '' }}>
-                                {{ $value }}</option>
-                        @endforeach
-                    </x-select-input>
-                    <x-input-error class="mt-2" :messages="$errors->get('type')" />
-                </div>
-                <div class="mt-4">
-                    <label class="cursor-pointer">
-                        <span class="block font-medium text-sm text-gray-700 dark:text-gray-300">Required</span>
-                    <input type="checkbox" value="1" name="is_required"
-                            class="sr-only peer">
-                        <div
-                            class="mt-2 relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600">
-                        </div>
-                    </label>
-                </div>
-            </div>
-
-            <div class="mt-4" id="options" x-show="addInputShow">
-                <div class="flex flex-col text-center items-center">
-
-                    <div id="inputContainer" class="w-full">
-                        <div class="flex gap-4 w-full input-group">
-                            <x-text-input name="options[]" placeholder="Isi Opsi"
-                                type="text" class="mt-1 block w-full" autocomplete="option[]" />
-                            <p class="pt-2">
-                                <x-danger-button type="button"
-                                    class="text-xs rounded m-0 remove-btn">&times;</x-danger-button>
-                            </p>
-                        </div>
-                    </div>
-                    <button type="button" id="addInput"
-                        class="text-xs rounded mt-2 p-2 border border-collapse w-24 ">Add Input</button>
-                    <x-input-error class="mt-2" :messages="$errors->get('options')" />
-                </div>
-            </div>
-
-
-            <div class="mt-6 flex justify-end">
-                <x-primary-button class="ms-3">
+            @if(auth()->user()->hasRole('admin') || ($form->status  == 'draft' || $form->status  == 'rejected'))
+                <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100 mt-4">
                     {{ __('Add Question') }}
-                </x-primary-button>
-            </div>
+                </h2>
+
+                <div class="mt-4">
+                    <x-input-label for="question" :value="__('Question *')" />
+                    <x-textarea-input id="question" name="question" type="text" class="mt-1 block w-full" required
+                        autofocus autocomplete="question">{{ old('question') }}</x-textarea-input>
+                    <x-input-error class="mt-2" :messages="$errors->get('question')" />
+                </div>
+
+                <div class="flex gap-8">
+                    <div class="mt-4">
+                        <x-input-label for="column_name" :value="__('Column Name')" />
+                        <x-text-input id="column_name" name="column_name" type="text" class="mt-1 block w-full"
+                            :value="old('column_name')" autofocus autocomplete="column_name" placeholder="boleh dikosongkan" />
+                        <x-input-error class="mt-2" :messages="$errors->addQuestion->get('column_name')" />
+                    </div>
+
+                    <div class="mt-4">
+                        <x-input-label for="type" :value="__('Type')" />
+                        <x-select-input name="type" class="mt-1 block w-full"
+                            x-on:change="typeChange($event.target.value)">
+                            @foreach ($optType as $key => $value)
+                                <option value="{{ $key }}" {{ old('type') == $key ? 'selected' : '' }}>
+                                    {{ $value }}</option>
+                            @endforeach
+                        </x-select-input>
+                        <x-input-error class="mt-2" :messages="$errors->get('type')" />
+                    </div>
+                    <div class="mt-4">
+                        <label class="cursor-pointer">
+                            <span class="block font-medium text-sm text-gray-700 dark:text-gray-300">Required</span>
+                        <input type="checkbox" value="1" name="is_required"
+                                class="sr-only peer">
+                            <div
+                                class="mt-2 relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600">
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="mt-4" id="options" x-show="addInputShow">
+                    <div class="flex flex-col text-center items-center">
+
+                        <div id="inputContainer" class="w-full">
+                            <div class="flex gap-4 w-full input-group">
+                                <x-text-input name="options[]" placeholder="Isi Opsi"
+                                    type="text" class="mt-1 block w-full" autocomplete="option[]" />
+                                <p class="pt-2">
+                                    <x-danger-button type="button"
+                                        class="text-xs rounded m-0 remove-btn">&times;</x-danger-button>
+                                </p>
+                            </div>
+                        </div>
+                        <button type="button" id="addInput"
+                            class="text-xs rounded mt-2 p-2 border border-collapse w-24 ">Add Input</button>
+                        <x-input-error class="mt-2" :messages="$errors->get('options')" />
+                    </div>
+                </div>
+
+                <div class="mt-6 flex justify-end">
+                    <x-primary-button class="ms-3">
+                        {{ __('Add Question') }}
+                    </x-primary-button>
+                </div>
+            @endif
 
             <script>
                 $(document).ready(function() {

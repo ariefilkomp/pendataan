@@ -103,15 +103,16 @@
                 <div id="add-question">
 
                 </div>
-        
-                <div class="flex items-center gap-4">
-                    <x-primary-button>{{ __('Save') }}</x-primary-button>
-        
-                    @if (session('status') === 'profile-updated')
-                        <p x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 2000)"
-                            class="text-sm text-gray-600 dark:text-gray-400">{{ __('Saved.') }}</p>
-                    @endif
-                </div>
+                @if(auth()->user()->hasRole('admin') || ($form->status  == 'draft' || $form->status  == 'rejected'))
+                    <div class="flex items-center gap-4">
+                        <x-primary-button>{{ __('Save') }}</x-primary-button>
+            
+                        @if (session('status') === 'profile-updated')
+                            <p x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 2000)"
+                                class="text-sm text-gray-600 dark:text-gray-400">{{ __('Saved.') }}</p>
+                        @endif
+                    </div>
+                @endif
             </form>
         </div>
     </div>
@@ -122,8 +123,13 @@
         </div>
 
         @role('admin')
-        <h2 class=" px-6 py-4 font-semibold text-lg text-gray-800 dark:text-gray-200 leading-tight"> Form Approval</h2>
-            <form method="post" action="{{ url('form-approval') }}" class="mt-6 space-y-6">
+            <h2 class="py-4 font-semibold text-lg text-gray-800 dark:text-gray-200 leading-tight"> Form Approval</h2>
+            @if (session('status') === 'form-approval')
+                <p x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 3000)"
+                    class="bg-green-400 p-4 rounded-md text-sm text-gray-600 dark:text-gray-400">{{ __('Form Approval Berhasil disimpan.') }}</p>
+            @endif
+            <form method="post" action="{{ url('form-approval') }}" class="space-y-6">
+                @csrf
                 <input type="hidden" name="id" value="{{ $form->id }}">
                 <div>
                     <x-input-label for="status" :value="__('STATUS')" />
@@ -135,13 +141,28 @@
                     </x-select-input>
                     <x-input-error class="mt-2" :messages="$errors->get('for_role')" />
                 </div>
+
                 <div>
                     <x-input-label for="message" :value="__('Pesan Tolak')" />
-                    <x-textarea-input id="message" name="description" type="text"
-                        class="mt-1 block w-full" required autofocus
-                        autocomplete="description">{{ old('message') }}</x-textarea-input>
+                    <x-textarea-input id="message" name="message" type="text"
+                        class="mt-1 block w-full" autofocus
+                        autocomplete="message">{{ old('message') }}</x-textarea-input>
                     <x-input-error class="mt-2" :messages="$errors->get('message')" />
                 </div>
+
+                <div>
+                    <x-input-label for="published" :value="__('Publish')" class="text-xs"/>
+                    <label class="cursor-pointer">
+                        <span class="block font-medium text-sm text-gray-700 dark:text-gray-300">Publish Form</span>
+                        <input type="checkbox" id="published" value="1"
+                            name="published" class="sr-only peer" @if($form->published) checked @endif>
+                        <div
+                            class="mt-2 relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600">
+                        </div>
+                    </label>
+                    <x-input-error class="mt-2" :messages="$errors->get('published')" />
+                </div>
+                
 
                 <div class="flex items-center gap-4">
                     <x-primary-button>{{ __('Simpan') }}</x-primary-button>
@@ -155,9 +176,17 @@
         @endrole
 
         @role('opd')
-            @if($form->status == 'draft')
+            @if (session('status') === 'form-submit-to-admin')
+                <p x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 3000)"
+                    class="bg-green-400 p-4 rounded-md text-sm text-gray-600 dark:text-gray-400">{{ __('Berhasil Meminta moderasi.') }}</p>
+            @endif
+            @if($form->status == 'draft' || $form->status == 'rejected')
+                @if($form->status == 'rejected')
+                    <h2 class=" px-6 py-4 font-semibold text-lg text-gray-800 dark:text-gray-200 leading-tight">Status: Ditolak</h2>
+                @endif
                 <h2 class="py-4 font-semibold text-lg text-gray-800 dark:text-gray-200 leading-tight">Ajukan ke Admin</h2>
                 <form method="post" action="{{ url('form-submit-to-admin') }}" onsubmit="return confirm('Yakin untuk meminta moderasi?');">
+                    @csrf
                     <input type="hidden" name="id" value="{{ $form->id }}">
                     <div class="flex items-center gap-4">
                         <x-primary-button>{{ __('Minta Moderasi') }}</x-primary-button>
@@ -168,11 +197,25 @@
                     </div>
                 </form>
             @elseif($form->status == 'submitted')
-                <h2 class=" px-6 py-4 font-semibold text-lg text-gray-800 dark:text-gray-200 leading-tight">Status: Sedang Tinjau</h2>
+                <h2 class=" px-6 py-4 font-semibold text-lg text-gray-800 dark:text-gray-200 leading-tight">Status: Sedang Ditinjau oleh Admin</h2>
             @elseif($form->status == 'approved')
                 <h2 class=" px-6 py-4 font-semibold text-lg text-gray-800 dark:text-gray-200 leading-tight">Status: Disetujui</h2>
-            @elseif($form->status == 'rejected')
-                <h2 class=" px-6 py-4 font-semibold text-lg text-gray-800 dark:text-gray-200 leading-tight">Status: Ditolak</h2>
+            @endif
+
+            @if($form->status == 'rejected' && $rejectMessages->count() > 0)
+                <h2 class=" px-6 py-4 font-semibold text-lg text-gray-800 dark:text-gray-200 leading-tight">Alasan Ditolak</h2>
+                <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
+                    <div class="max-w-2xl m-auto">
+                        @foreach ($rejectMessages as $rejectMessage)
+                            <div class="flex items-center justify-between mt-2 p-2 sm:p-4 bg-white dark:bg-gray-800 shadow sm:rounded-lg border border-gray-200 dark:border-gray-700">
+                                <div>
+                                    <p class="text-gray-700 text-base ">{{ $rejectMessage->message }}</p>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+                
             @endif
         @endrole
     </div>

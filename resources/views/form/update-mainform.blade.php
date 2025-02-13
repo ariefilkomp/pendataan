@@ -34,6 +34,7 @@
                                 </li>
                             @endif
                         @endforeach
+                        @if(auth()->user()->hasRole('admin') || ($form->status  == 'draft' || $form->status  == 'rejected'))
                         <li class="me-2">
                             <a href="#" x-data=""
                                 x-on:click.prevent="$dispatch('open-modal', 'add-section-modal')"
@@ -53,23 +54,27 @@
                                 &nbsp; Add Section
                             </a>
                         </li>
+                        @endif
                     </ul>
                     @if($form->sections->count() > 0)
-                    <div class="flex justify-between">
-                        <div class="flex flex-col">
-                            <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100 mt-4">
-                                {{ __('Section ' . $form->sections?->where('id', $section_id)->first()?->order . ' / ' . $form->sections->count()) }}
-                            </h2>
-                            <x-secondary-button x-data="" x-on:click="$dispatch('open-modal', 'edit-section-modal')" >
-                                Edit Section
-                            </x-secondary-button>
-                        </div>
-                        <p class="text-gray-500 text-xs text-right mt-4">
-                            <button x-data="" x-on:click="$dispatch('open-modal', 'delete-section-modal')"
-                                class="right-0 inline-flex items-center px-2 py-1 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white tracking-widest hover:bg-red-500 active:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">Delete
-                                Section</button>
-                        </p>
-                    </div>
+                        @if(auth()->user()->hasRole('admin') || ($form->status  == 'draft' || $form->status  == 'rejected'))
+                            <div class="flex justify-between">
+                                <div class="flex flex-col">
+                                    <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100 mt-4">
+                                        {{ __('Section ' . $form->sections?->where('id', $section_id)->first()?->order . ' / ' . $form->sections->count()) }}
+                                    </h2>
+                                    <x-secondary-button x-data="" x-on:click="$dispatch('open-modal', 'edit-section-modal')" >
+                                        Edit Section
+                                    </x-secondary-button>
+                                </div>
+                                
+                                <p class="text-gray-500 text-xs text-right mt-4">
+                                    <button x-data="" x-on:click="$dispatch('open-modal', 'delete-section-modal')"
+                                        class="right-0 inline-flex items-center px-2 py-1 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white tracking-widest hover:bg-red-500 active:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">Delete
+                                        Section</button>
+                                </p>
+                            </div>
+                        @endif
                     @endif
 
                 </div>

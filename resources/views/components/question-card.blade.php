@@ -7,7 +7,9 @@
             <p class="text-gray-500 text-sm ">{{ $question?->is_required ? 'required' : 'not required' }}</p>
         </div>
     </div>
+    @if(!$disabled)
     <x-secondary-button type="button" class="mt-4" x-on:click.prevent="$dispatch('open-modal', 'edit-question-modal') " onclick="setUpdateData({{ json_encode($question) }})">
         Edit
     </x-secondary-button>
+    @endif
 </div>

@@ -32,6 +32,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware(['role:admin|opd'])->group(function () {
         Route::get('/create-form', [FormController::class, 'create'])->name('create-form');
         Route::post('/create-form', [FormController::class, 'store']);
+        Route::post('/form-submit-to-admin', [FormController::class, 'submitToAdmin']);
         
         Route::get('/edit-form/{id}', [FormController::class, 'edit'])->name('edit-form');
         Route::patch('/edit-form', [FormController::class, 'update']);

@@ -13,7 +13,8 @@ class QuestionCard extends Component
      * Create a new component instance.
      */
     public function __construct(
-        public Question | null $question = null
+        public Question | null $question = null,
+        public bool $disabled = false
     )
     {
         //

@@ -72,36 +72,9 @@
                     },
                     {
                         "render": function(data, type, row, meta) {
-                            let editLink = '';
-                            let statLink = '';
-                            let fillLink = '';
-                            @role('admin')
-                                editLink =
-                                    `<a type="button" class="rounded border border-gray-300 bg-white px-2 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50" style="margin:5px;" href="{{ url('/edit-form') }}/` +
-                                    row.id +
-                                    `" title="Lihat">Edit</a>&nbsp;
-                                    `;
-                                statLink =
-                                    `<a type="button" class="rounded border border-gray-300 bg-white px-2 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50" style="margin:5px;" href="{{ url('/data') }}/` +
-                                    row.id +
-                                    `" title="Lihat">Data</a>&nbsp;
-                                    `;
-                            @endrole
-
-                            @role('opd')
-                                statLink =
-                                    `<a type="button" class="rounded border border-gray-300 bg-white px-2 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50" style="margin:5px;" href="{{ url('/data') }}/` +
-                                    row.id +
-                                    `" title="Lihat">Statistik</a>&nbsp;
-                                    `;
-                            @endrole
-
-                            fillLink = `<a type="button" class="rounded border border-gray-300 bg-white px-2 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50" style="margin:5px;" href="{{ url('/') }}/` +
+                            let fillLink = `<a type="button" class="rounded border border-gray-300 bg-white px-2 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50" style="margin:5px;" href="{{ url('/') }}/` +
                                 row.slug + `" title="Isi Data">Isi Data</a>&nbsp;`;
-
-                            let link = `<div class="flex justify-center gap-4">` + editLink + statLink + fillLink + `</div>`;
-
-                            return link;
+                            return fillLink;
                         }
                     },
 

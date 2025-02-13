@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Models\Form;
+use App\Models\RejectMessage;
 use App\Models\Section;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
@@ -105,10 +106,16 @@ class FormController extends Controller
             return abort(403);
         }
 
+        $rejectMessages = collect([]);
+        if($form->status == 'rejected') {
+            $rejectMessages = RejectMessage::where('form_id', $id)->get();
+        }
+
         return view('form.update-mainform', [
             'form' => $form,
             'section_id' => $form->sections?->sortBy('order', SORT_NUMERIC)->first()?->id,
-            'optType' => $this->optType
+            'optType' => $this->optType,
+            'rejectMessages' => $rejectMessages
         ]);
     }
 
@@ -302,7 +309,7 @@ class FormController extends Controller
 
         if($form->sections->count() == 1 || $section->order == $form->sections->count()) {
             DB::table($form->table_name)->where('user_id', auth()->user()->id)->whereNull('submitted_at')->update(['submitted_at' => now()]);
-            return view('form.submitted');
+            return view('form.submitted', ['formUrl' => url($form->slug)]);
         } else {
             $nextSection = $form->sections->where('order', $section->order + 1)->first();
             return redirect('/'.$form->slug.'/'.$nextSection->id)->with('status', 'form-submitted');
@@ -362,12 +369,32 @@ class FormController extends Controller
     public function formApproval(Request $request) {
         $request->validate([
             'id' => 'required',
-            'status' => 'required|in:draft,submitted,approved,rejected'
+            'status' => 'required|in:draft,submitted,approved,rejected',
+            'message' => 'required_if:status,rejected',
+            'published' => 'nullable|numeric'
         ]);
 
         $form = Form::findOrFail($request->id);
         $form->status = $request->status;
-        $form->save();
+        $form->published = $request->published ? 1 : 0;
+        if($form->save() && $request->status == 'rejected') {
+            RejectMessage::create([
+                'form_id' => $form->id,
+                'message' => $request->message,
+                'user_id' => auth()->user()->id
+            ]);
+        }
         return redirect()->back()->with('status', 'form-approval');
+    }
+
+    public function submitToAdmin(Request $request) {
+        $request->validate([
+            'id' => 'required',
+        ]);
+
+        $form = Form::findOrFail($request->id);
+        $form->status = 'submitted';
+        $form->save();
+        return redirect()->back()->with('status', 'form-submit-to-admin');
     }
 }
