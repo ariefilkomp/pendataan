@@ -11,6 +11,10 @@
                 <h2 class=" px-6 py-4 font-semibold text-lg text-gray-800 dark:text-gray-200 leading-tight">
                     {{ __('Available Form') }}
                 </h2>
+                @if (session('status') === 'form-deleted')
+                <p x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 3000)"
+                    class="bg-green-400 p-4 rounded-md text-sm text-gray-600 dark:text-gray-400">{{ __('Form Berhasi Dihapus!') }}</p>
+                @endif
                 <div class="p-6 text-gray-900 dark:text-gray-100 text-sm">
                     <table id="dashboardTable">
                         <thead>

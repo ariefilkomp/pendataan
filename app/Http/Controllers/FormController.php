@@ -397,4 +397,10 @@ class FormController extends Controller
         $form->save();
         return redirect()->back()->with('status', 'form-submit-to-admin');
     }
+
+    public function delete(Request $request) {    
+        $form = Form::findOrFail($request->id);
+        $form->delete();
+        return redirect('/dashboard')->with('status', 'form-deleted');
+    }   
 }

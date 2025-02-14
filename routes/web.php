@@ -39,6 +39,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/edit-form/{id}/{section_id}', [FormController::class, 'editWithSection'])->name('edit-form-section');
 
         Route::delete('/delete-question', [QuestionController::class, 'delete'])->name('delete-question');
+        Route::delete('/delete-form', [FormController::class, 'delete'])->name('delete-form');
 
         Route::post('/add-section', [SectionController::class, 'store'])->name('add-section');
         Route::patch('/edit-section', [SectionController::class, 'update'])->name('edit-section');

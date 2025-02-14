@@ -1,4 +1,17 @@
 <section>
+    @if(auth()->user()->hasRole('admin') || ($form->status  == 'draft' || $form->status  == 'rejected'))
+        <div class="flex justify-end">
+            <form method="post" action="{{ route('delete-form') }}" onsubmit="return confirm('Yakin mau hapus form ini?');">
+                @csrf
+                @method('delete')
+                <input type="hidden" name="id" value="{{ $form->id }}">
+                <x-danger-button>
+                    {{ __('Delete Form') }}
+                </x-danger-button>
+            </form>
+        </div>
+    @endif
+
     <header>
         <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
             {{ __('Update Form') }}
