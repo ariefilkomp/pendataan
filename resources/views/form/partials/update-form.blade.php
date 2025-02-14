@@ -197,6 +197,9 @@
                 @if($form->status == 'rejected')
                     <h2 class=" px-6 py-4 font-semibold text-lg text-gray-800 dark:text-gray-200 leading-tight">Status: Ditolak</h2>
                 @endif
+                @if($form->status == 'draft')
+                    <h2 class=" px-6 py-4 font-semibold text-lg text-gray-800 dark:text-gray-200 leading-tight">Status: Draft</h2>
+                @endif
                 <h2 class="py-4 font-semibold text-lg text-gray-800 dark:text-gray-200 leading-tight">Ajukan ke Admin</h2>
                 <form method="post" action="{{ url('form-submit-to-admin') }}" onsubmit="return confirm('Yakin untuk meminta moderasi?');">
                     @csrf
