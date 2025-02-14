@@ -91,6 +91,7 @@
                             let editLink = '';
                             let statLink = '';
                             let fillLink = '';
+                            let previewLink = '';
                             
                             editLink =
                                 `<a type="button" class="rounded border border-gray-300 bg-white px-2 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50" style="margin:5px;" href="{{ url('/edit-form') }}/` +
@@ -103,10 +104,13 @@
                                 `" title="Lihat">Data</a>&nbsp;
                                 `;
 
+                            previewLink = `<a type="button" class="rounded border border-gray-300 bg-white px-2 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50" style="margin:5px;" href="{{ url('/') }}/preview/` +
+                                row.slug + `" title="Isi Data">Preview</a>&nbsp;`;
+
                             fillLink = `<a type="button" class="rounded border border-gray-300 bg-white px-2 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50" style="margin:5px;" href="{{ url('/') }}/` +
                                 row.slug + `" title="Isi Data">Isi Data</a>&nbsp;`;
 
-                            let link = `<div class="flex justify-center gap-4">` + editLink + statLink + fillLink + `</div>`;
+                            let link = `<div class="flex flex-wrap justify-center w-[150px]">` + editLink + statLink + fillLink + previewLink + `</div>`;
 
                             return link;
                         }

@@ -22,9 +22,6 @@ Route::get('/sso/login', [AuthController::class, 'ssoLogin'])->name('ssoLogin');
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('/dashboard', [DashboardController::class, 'gettable']);
-    
-    Route::get('/forms', [FormController::class, 'forms'])->name('forms');
-    Route::post('/forms', [FormController::class, 'gettable']);
 
     Route::post('/form-submit', [FormController::class, 'submit'])->name('form-submit');
     Route::post('/upload-file', [FileController::class, 'upload'])->name('upload-file');
@@ -33,6 +30,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/create-form', [FormController::class, 'create'])->name('create-form');
         Route::post('/create-form', [FormController::class, 'store']);
         Route::post('/form-submit-to-admin', [FormController::class, 'submitToAdmin']);
+
+        Route::get('/forms', [FormController::class, 'forms'])->name('forms');
+        Route::post('/forms', [FormController::class, 'gettable']);
+
+        Route::get('/preview/{slug}', [FormController::class, 'preview'])->name('preview');
+        Route::get('/preview/{slug}/{section_id}', [FormController::class, 'previewWithSection'])->name('preview-with-section');
         
         Route::get('/edit-form/{id}', [FormController::class, 'edit'])->name('edit-form');
         Route::patch('/edit-form', [FormController::class, 'update']);

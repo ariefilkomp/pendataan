@@ -402,5 +402,57 @@ class FormController extends Controller
         $form = Form::findOrFail($request->id);
         $form->delete();
         return redirect('/dashboard')->with('status', 'form-deleted');
-    }   
+    }
+
+    public function preview($slug){
+        $form = Form::where('slug', $slug);
+        if(!auth()->user()->hasRole('admin')) {
+            $form = $form->where('user_id', auth()->user()->id);
+        }
+
+        $form = $form->firstOrFail();
+
+        $data = DB::table($form->table_name)->where('user_id', auth()->user()->id)->whereNull('submitted_at')->first();
+        if(empty($data)){
+            DB::table($form->table_name)->insert([
+                'id' => Str::uuid(),
+                'user_id' => auth()->user()->id
+            ]);
+            $data = DB::table($form->table_name)->where('user_id', auth()->user()->id)->whereNull('submitted_at')->first();
+        }
+        return view('form.preview', [
+            'form' => $form,
+            'section' => $form->sections?->sortBy('order', SORT_NUMERIC)->first(),
+            'optType' => $this->optType,
+            'data' => $data
+        ]);
+    }
+
+    public function previewWithSection($slug, $section_id){
+        $form = Form::where('slug', $slug);
+        if(!auth()->user()->hasRole('admin')) {
+            $form = $form->where('user_id', auth()->user()->id);
+        }
+
+        $form = $form->firstOrFail();
+
+        $data = DB::table($form->table_name)->where('user_id', auth()->user()->id)->whereNull('submitted_at')->first();
+        if(empty($data)){
+            DB::table($form->table_name)->insert([
+                'id' => Str::uuid(),
+                'user_id' => auth()->user()->id
+            ]);
+            $data = DB::table($form->table_name)->where('user_id', auth()->user()->id)->whereNull('submitted_at')->first();
+        }
+        $section = $form->sections?->where('id', $section_id)->firstOrFail();
+        
+        $data = DB::table($form->table_name)->where('user_id', auth()->user()->id)->whereNull('submitted_at')->first();
+        return view('form.preview', [
+            'form' => $form,
+            'section' => $section,
+            'optType' => $this->optType,
+            'data' => $data
+        ]);
+    }
+
 }
