@@ -205,7 +205,7 @@ class FormController extends Controller
 
         if(auth()->guest()) {
             session()->put('url.intended', url($form->slug));
-            return view('form.must-login');
+            return view('form.must-login',['form' => $form]);
         }
 
         if($form->for_role == 'opd' && !auth()->user()->hasAnyRole(['opd', 'admin'])) {
