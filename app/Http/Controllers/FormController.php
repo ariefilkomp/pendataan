@@ -142,7 +142,7 @@ class FormController extends Controller
             DB::statement('RENAME TABLE `' . $oldTableName . '` TO `' . $form->table_name .'`');
         }
 
-        if($oldSlug != $request->slug && isset($form->short_id)) {
+        if($oldSlug != $request->slug) {
             $newSlug = Str::slug($request->slug,'-');
 
             /* 
@@ -169,16 +169,18 @@ class FormController extends Controller
                 dd($response);
             */
 
-            /* bikin short url lagi */
-            $response = Http::acceptJson()->withBody(json_encode(['long_url' => url('/'.$newSlug), 'title' => $request->name]))->withHeaders([
-                'X-Auth-Id' =>  env('SID_AUTH_ID'),
-                'X-Auth-Key' => env('SID_AUTH_KEY'), 
-            ])->post('https://api.s.id/v1/links');
-        
-            if($response->successful()) {
-                $form->slug = $newSlug;
-                $form->short_slug = $response->json()['data']['short'];
-                $form->short_id = $response->json()['data']['id'];
+            $form->slug = $newSlug;
+            if(isset($form->short_id)) {
+                /* bikin short url lagi */
+                $response = Http::acceptJson()->withBody(json_encode(['long_url' => url('/'.$newSlug), 'title' => $request->name]))->withHeaders([
+                    'X-Auth-Id' =>  env('SID_AUTH_ID'),
+                    'X-Auth-Key' => env('SID_AUTH_KEY'), 
+                ])->post('https://api.s.id/v1/links');
+            
+                if($response->successful()) {
+                    $form->short_slug = $response->json()['data']['short'];
+                    $form->short_id = $response->json()['data']['id'];
+                }
             }
         }
 
