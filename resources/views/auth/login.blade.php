@@ -54,5 +54,12 @@
                 &nbsp; {{ __('Masuk dengan Akun SAKTI') }}
             </x-secondary-link>
         </div>
+
+        <div class="flex items-center justify-center mt-8">
+            <x-secondary-link href="{{ url('/auth/google')}}" class="ms-3">
+                <img src="{{ asset('assets/images/google.png')}}" alt="Google" class="ms-3 w-6 h-6">
+                &nbsp; {{ __('Masuk dengan Akun Google') }}
+            </x-secondary-link>
+        </div>
     </form>
 </x-guest-layout>

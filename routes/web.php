@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FileController;
@@ -18,6 +19,9 @@ Route::get('/', function () {
 
 Route::get('/sso/callback', [AuthController::class, 'ssoCallback'])->name('ssoCallback');
 Route::get('/sso/login', [AuthController::class, 'ssoLogin'])->name('ssoLogin');
+
+Route::get('/auth/{provider}', [SocialiteController::class, 'redirectToProvider']);
+Route::get('/auth/{provider}/callback', [SocialiteController::class, 'handleProvideCallback']);
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');

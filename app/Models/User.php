@@ -58,4 +58,9 @@ class User extends Authenticatable
             $model->id = $model->id ?? Str::uuid();
         });
     }
+
+    public function socialAccounts()
+    {
+        return $this->hasMany(SocialAccount::class);
+    }
 }
