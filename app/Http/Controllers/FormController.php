@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Models\Form;
+use App\Models\Message;
 use App\Models\RejectMessage;
 use App\Models\Section;
 use Illuminate\Support\Facades\Http;
@@ -195,7 +196,11 @@ class FormController extends Controller
     }
 
     public function show($slug){
-        $form = Form::where('slug', $slug)->where('published', 1)->where('status','approved')->firstOrFail();
+        $form = Form::where('slug', $slug)->firstOrFail();
+        if($form->status != 'approved' || $form->published != 1) {
+            return view('form.unapproved', ['form' => $form]);
+        }
+
         if(!$form->multi_entry) {
             $data = DB::table($form->table_name)->where('user_id', auth()->user()->id)->whereNotNull('submitted_at')->first();
             if($data){
@@ -396,7 +401,13 @@ class FormController extends Controller
 
         $form = Form::findOrFail($request->id);
         $form->status = 'submitted';
-        $form->save();
+        if($form->save()) {
+             Message::create([
+                'to' => env('NO_WA_ADMIN','088802462823'),
+                'message' => 'Form Baru diajukan oleh '.$form->user->name.' - Judul form : '.$form->name.' - Link : '.url('edit-form/'.$form->slug),
+                'form_id' => $form->id,
+            ]);
+        }
         return redirect()->back()->with('status', 'form-submit-to-admin');
     }
 

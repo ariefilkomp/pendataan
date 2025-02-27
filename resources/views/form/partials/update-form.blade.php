@@ -48,8 +48,8 @@
                 <div>
                     <x-input-label for="for_role" :value="__('For Role')" />
                     <x-select-input name="for_role" id="for_role" class="mt-1 block w-full">
-                        <option value="opd" {{ old('for_role',$form->for_role) == 'opd' ? 'selected' : '' }}>OPD</option>
                         <option value="umum" {{ old('for_role',$form->for_role) == 'umum' ? 'selected' : '' }}>UMUM</option>
+                        <option value="opd" {{ old('for_role',$form->for_role) == 'opd' ? 'selected' : '' }}>OPD</option>
                     </x-select-input>
                     <x-input-error class="mt-2" :messages="$errors->get('for_role')" />
                 </div>
@@ -188,7 +188,7 @@
             </form>
         @endrole
 
-        @role('opd')
+        @if(auth()->user()->hasAnyRole(['umum', 'opd']))
             @if (session('status') === 'form-submit-to-admin')
                 <p x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 3000)"
                     class="bg-green-400 p-4 rounded-md text-sm text-gray-600 dark:text-gray-400">{{ __('Berhasil Meminta moderasi.') }}</p>
@@ -233,7 +233,7 @@
                 </div>
                 
             @endif
-        @endrole
+        @endif
     </div>
 </section>
 <script>

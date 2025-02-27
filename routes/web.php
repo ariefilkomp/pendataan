@@ -30,7 +30,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/form-submit', [FormController::class, 'submit'])->name('form-submit');
     Route::post('/upload-file', [FileController::class, 'upload'])->name('upload-file');
     
-    Route::middleware(['role:admin|opd'])->group(function () {
+    Route::middleware(['role:admin|opd|umum'])->group(function () {
         Route::get('/create-form', [FormController::class, 'create'])->name('create-form');
         Route::post('/create-form', [FormController::class, 'store']);
         Route::post('/form-submit-to-admin', [FormController::class, 'submitToAdmin']);

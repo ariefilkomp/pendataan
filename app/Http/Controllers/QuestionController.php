@@ -45,7 +45,11 @@ class QuestionController extends Controller
             $colStr = "`{$request->column_name}` TIME NULL DEFAULT NULL";
         }
 
-        $form = Form::findOrFail($request->form_id);
+        if(auth()->user()->hasRole('admin')) {
+            $form = Form::where('id', $request->form_id)->firstOrFail();
+        } else {
+            $form = Form::where('id', $request->form_id)->where('user_id', auth()->user()->id)->firstOrFail();
+        }
         
         $question = new Question();
         $question->form_id = $request->form_id;

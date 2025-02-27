@@ -12,14 +12,14 @@
                     {{ __('Available Form') }}
                 </h2>
                 <div class="p-6 text-gray-900 dark:text-gray-100 text-sm">
-                    @if(auth()->user()->hasAnyRole(['admin', 'opd']))
+                    @if(auth()->user()->hasAnyRole(['admin', 'opd','umum']))
                         <x-primary-link href="/create-form"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="w-4 h-4 rounded bg-white"><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z"/></svg>
                             &nbsp; Tambah Form</x-primary-link>
                     @endif
                     <table id="dashboardTable">
                         <thead>
                             <tr>
-                                @if(auth()->user()->hasAnyRole(['admin', 'opd']))
+                                @if(auth()->user()->hasAnyRole(['admin', 'opd','umum']))
                                 <th>Nama Tabel</th>
                                 <th>Slug</th>
                                 @endif
@@ -54,7 +54,7 @@
                 },
                 "columnDefs": [],
                 "columns": [
-                    @if(auth()->user()->hasAnyRole(['admin', 'opd']))
+                    @if(auth()->user()->hasAnyRole(['admin', 'opd','umum']))
                     {
                         "render": function(data, type, row, meta) {
                             return row.table_name;

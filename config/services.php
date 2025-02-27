@@ -41,4 +41,10 @@ return [
         'redirect' => env('GOOGLE_CLIENT_REDIRECT'),
      ],
 
+    'sakti' => [
+        'client_id' => env('SSO_CLIENT_ID'),
+        'client_secret' => env('SSO_CLIENT_SECRET'),
+        'redirect' => env('SSO_CALLBACK_URI'),
+     ],
+
 ];
