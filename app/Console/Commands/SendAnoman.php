@@ -62,6 +62,7 @@ class SendAnoman extends Command
         $pp = [
             'no_hp' => $no_hp,
             'pesan' => $message->message,
+            'no_footer' => 1
         ];
         
         $response = Http::accept('application/json')->withToken($token)->post($url, $pp);

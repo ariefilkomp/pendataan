@@ -340,9 +340,9 @@ class FormController extends Controller
         
         $data = Form::with('sections');
 
-        if(!auth()->user()->hasAnyRole(['admin', 'opd'])) {
-            $data = $data->where('for_role', 'umum');
-        }
+        // if(!auth()->user()->hasAnyRole(['admin', 'opd'])) {
+        //     $data = $data->where('for_role', 'umum');
+        // }
 
         if(!auth()->user()->hasAnyRole(['admin'])) {
             $data = $data->where('user_id', auth()->user()->id);
