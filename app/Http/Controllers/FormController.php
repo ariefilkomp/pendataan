@@ -214,7 +214,7 @@ class FormController extends Controller
         }
 
         if($form->for_role == 'opd' && !auth()->user()->hasAnyRole(['opd', 'admin'])) {
-            return abort(404);
+            return view('form.opd-only-message', ['form' => $form]);
         }
 
         $data = DB::table($form->table_name)->where('user_id', auth()->user()->id)->whereNull('submitted_at')->first();
